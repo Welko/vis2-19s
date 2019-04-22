@@ -1,1 +1,5 @@
-vis2-19s
+Real-Time Interactive Satellite Tracker
+
+Authors:
+Dominik Scholz
+Lucas da Cunha Melo
