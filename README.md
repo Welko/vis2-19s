@@ -1,5 +1,5 @@
-Real-Time Interactive Satellite Tracker
+# Real-Time Interactive Satellite Tracker
 
 Authors:
-Dominik Scholz
-Lucas da Cunha Melo
+- Dominik Scholz
+- Lucas da Cunha Melo
