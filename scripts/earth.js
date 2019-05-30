@@ -18,7 +18,9 @@ function intersectEarth(raycaster) {
 
     let intersects = raycaster.intersectObject(_earth);
 
-    console.log(intersects);
+    if (intersects.length > 0) {
+        console.log("Intersected!");
+    }
 
     /*if (intersects.length > 0) {
 
@@ -43,4 +45,6 @@ function intersectEarth(raycaster) {
         INTERSECTED = null;
         satellite_nameplate.innerHTML = "";
     }*/
+
+    return intersects.length > 0;
 }

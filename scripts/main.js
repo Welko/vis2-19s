@@ -106,10 +106,6 @@ function onMouseMove(event) {
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
     mouse_screen.x = event.clientX;
     mouse_screen.y = event.clientY;
-
-    if (f_ctrl_drag) {
-      console.log("Control dragging!");
-    }
 }
 
 function animate() {
@@ -121,13 +117,19 @@ function render() {
   let delta = clock.getDelta();
 
   cameraControls.update(delta);
+  raycaster.setFromCamera(mouse, camera)
 
-  if (_sats_points != null) {
-    raycaster.setFromCamera(mouse, camera);
-    intersectSatellites(raycaster);
+  let plsIntersect = true; // Please intersect!
+
+  if (plsIntersect && f_ctrl_drag && _earth != null) {
+    plsIntersect = ! intersectEarth(raycaster);
+  }
+
+  if (plsIntersect && _sats_points != null) {
+    plsIntersect = ! intersectSatellites(raycaster);
+  }
 
     updateSatellites(delta);
-  }
 
   // render scene
   renderer.render(scene, camera);

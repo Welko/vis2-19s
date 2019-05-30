@@ -174,7 +174,6 @@ function intersectSatellites(raycaster) {
     let attributes = geometry.attributes;
     let intersects = raycaster.intersectObject(_sats_points);
     if (intersects.length > 0) {
-
         // selected new satellite
         if (intersectedSatellite !== intersects[0].index) {
 
@@ -190,10 +189,15 @@ function intersectSatellites(raycaster) {
             satellite_nameplate.style.left = mouse_screen.x + "px";
             satellite_nameplate.style.top = mouse_screen.y + "px";
         }
+        return true;
+
     } else if (intersectedSatellite !== null) {
         attributes.size.array[intersectedSatellite] = PARTICLE_SIZE;
         attributes.size.needsUpdate = true;
         intersectedSatellite = null;
         satellite_nameplate.innerHTML = "";
+        // TODO make nameplate invisible
     }
+
+    return false;
 }
