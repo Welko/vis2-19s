@@ -177,14 +177,14 @@ function generateSatellites(callback) {
             let sat = sats[i];
             let index = typesCache.indexOf(sat.type);
             if (index === -1) {
-                typesCache.push(sat.stype);
+                typesCache.push(sat.type);
                 colorsCache.push(next_color_pastel());
                 index = typesCache.length - 1;
             }
 
             positions.push(sat.pos);
-            //colors.push(colorsCache[index]);
-            colors.push(1.0, 1.0, 1.0);
+            c = colorsCache[index];
+            colors.push(c[0], c[1], c[2]);
             sizes.push(PARTICLE_SIZE);
 
             var r = Math.sqrt(sat.pos.x^2 + sat.pos.y^2 + sat.pos.z^2); //Math.random() * (max_r - min_r) + min_r;
@@ -195,6 +195,8 @@ function generateSatellites(callback) {
             var velocity_theta = ((Math.random() * 2) - 1) * max_angular_speed;
             satellite_info.push(r, phi, theta, velocity_phi, velocity_theta);
         }
+
+        console.log("Loaded " + typesCache.length + " different types of satellites!");
 
         let geometry = new THREE.BufferGeometry();
         geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3).setDynamic(true));
@@ -287,18 +289,10 @@ function generateRandomSatellites() {
 
 let color_pastel_prev = -1;
 let color_pastel = [
-    new THREE.Color(0x8dd3c7),
-    new THREE.Color(0xffffb3),
-    new THREE.Color(0xbebada),
-    new THREE.Color(0xfb8072),
-    new THREE.Color(0x80b1d3),
-    new THREE.Color(0xfdb462),
-    new THREE.Color(0xb3de69),
-    new THREE.Color(0xfccde5),
-    new THREE.Color(0xd9d9d9),
-    new THREE.Color(0xbc80bd),
-    new THREE.Color(0xccebc5),
-    new THREE.Color(0xffed6f)
+    [0.89411765, 0.10196078, 0.10980392],
+    [0.21568627, 0.49411765, 0.72156863],
+    [0.30196078, 0.68627451, 0.29019608],
+    [0.59607843, 0.30588235, 0.63921569]
 ];
 function next_color_pastel() { return color_pastel[(++color_pastel_prev) % color_pastel.length] }
 function next_color() { return next_color_pastel(); }
