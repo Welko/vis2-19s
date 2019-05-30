@@ -1,4 +1,4 @@
-var fragmentShader = /* glsl */`
+var satellite_frag = /* glsl */`
 
 uniform vec3 mainColor;
 uniform sampler2D texture;

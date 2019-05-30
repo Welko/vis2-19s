@@ -85,24 +85,6 @@ function animate() {
   render();
 }
 
-// function updateSatellitePositionAngular(delta, position) {
-//   for (var i = 0, p = 0; i < satellite_info.length; i+=5, p+=3) {
-
-//     satellite_info[i+1] += delta * satellite_info[i+3];
-//     satellite_info[i+2] += delta * satellite_info[i+4];
-
-//     var r = satellite_info[i];
-//     var phi = satellite_info[i+1];
-//     var theta = satellite_info[i+2];
-
-//     position.array[p] = r * Math.sin(theta) * Math.cos(phi);
-//     position.array[p+1] = r * Math.sin(theta) * Math.sin(phi);
-//     position.array[p+2] = r * Math.cos(theta);
-//   }
-
-//   position.needsUpdate = true;
-// }
-
 function updateSatellitePosition(delta, position) {
   let positions = position.array;
   for (let i = 0; i < satellite_velocities.length; i++) {
@@ -113,7 +95,7 @@ function updateSatellitePosition(delta, position) {
 }
 
 function render() {
-    let delta = clock.getDelta();
+  let delta = clock.getDelta();
 
   cameraControls.update(delta);
 
@@ -159,47 +141,14 @@ function fillScene() {
   scene.fog = new THREE.Fog(0x050505, 2000, 3500);
   scene.add(camera);
 
+  scene.fog = new THREE.Fog(0x050505, 2000, 3500);
+
   // lights
   scene.add(new THREE.AmbientLight(0x222222));
-
   let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
   scene.add(directionalLight);
 
-  // grid
-  scene.add(new THREE.GridHelper(1000, 10));
-  scene.add(new THREE.PolarGridHelper(100, 36, 10, 64, 0xcc5555, 0xcc5555));
-
-  // earth
-  let earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
-  earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
-  let earth_material = new THREE.MeshStandardMaterial({color: 0xff0000});
-  earth = new THREE.Mesh(earth_geometry, earth_material);
-  scene.add(earth);
-
-  // moonlet
-  let moon_geometry = new THREE.SphereGeometry( 1, 48, 24 );
-  moon_geometry.scale(1.7381, 1.7360, 1.7381); // https://en.wikipedia.org/wiki/Moon
-  moon_geometry.translate(384.402, 0, 0);
-  let moon_material = new THREE.MeshStandardMaterial({color: 0xdddddd});
-  moon = new THREE.Mesh(moon_geometry, moon_material);
-  scene.add(moon);
-
-  // try plotting moon orbit:
-  let curve = new THREE.EllipseCurve(
-      0,  0,            // ax, aY
-      384, 400,           // xRadius, yRadius
-      0,  2 * Math.PI,  // aStartAngle, aEndAngle
-      false,            // aClockwise
-      0                // aRotation
-  );
-
-  let points = curve.getPoints( 50 );
-  let geometry = new THREE.BufferGeometry().setFromPoints(points);
-  geometry.rotateX(Math.PI * 0.67);
-  let material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
-  // Create the final object to add to the scene
-  let ellipse = new THREE.Line(geometry, material);
-  scene.add(ellipse);
+  fillSceneObjects(scene);
 
   //scene.add(generateRandomSatellites());
   generateSatellites(function(satPoints) {
@@ -264,8 +213,8 @@ function generateSatellites(callback) {
                 mainColor: { value: new THREE.Color( 0xffffff ) },
                 texture: { value: new THREE.TextureLoader().load("./resources/circle.png") }
             },
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader,
+            vertexShader: satellite_vert,
+            fragmentShader: satellite_frag,
             alphaTest: 0.9
         } );
 

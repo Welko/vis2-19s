@@ -1,4 +1,4 @@
-var vertexShader = /* glsl */`
+var satellite_vert = /* glsl */`
 
 attribute float size;
 attribute vec3 color;
