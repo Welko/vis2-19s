@@ -12,7 +12,7 @@ var PARTICLE_SIZE = 4; // remove later
 
 var clock = new THREE.Clock();
 
-var earth, satellites;
+var earth, satellites, moon;
 var satellite_info; //remove later
 
 function init() {
@@ -20,7 +20,7 @@ function init() {
   container = document.getElementById('canvas');
 
   // camera
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 1000);
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000);
   camera.position.set(-40, 85, -5);
 
   // renderer
@@ -136,14 +136,41 @@ function fillScene() {
   scene.add(directionalLight);
 
   // grid
-  scene.add(new THREE.GridHelper(100, 10));
+  // scene.add(new THREE.GridHelper(200, 10));
+  scene.add(new THREE.GridHelper(1000, 10));
+  scene.add(new THREE.PolarGridHelper(100, 36, 10, 64, 0xcc5555, 0xcc5555));
 
   // earth
   var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
-  earth_geometry.scale(6.378137, 6.356752, 6.378137); //earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
+  earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
   var earth_material = new THREE.MeshStandardMaterial({color: 0xff0000});
   earth = new THREE.Mesh(earth_geometry, earth_material);
   scene.add(earth);
+
+  // moon
+  var moon_geometry = new THREE.SphereGeometry( 1, 48, 24 );
+  moon_geometry.scale(1.7381, 1.7360, 1.7381); // https://en.wikipedia.org/wiki/Moon
+  moon_geometry.translate(384.402, 0, 0); 
+  var moon_material = new THREE.MeshStandardMaterial({color: 0xdddddd});
+  moon = new THREE.Mesh(moon_geometry, moon_material);
+  scene.add(moon);
+
+  // try plotting moon orbit:
+  var curve = new THREE.EllipseCurve(
+    0,  0,            // ax, aY
+    384, 400,           // xRadius, yRadius
+    0,  2 * Math.PI,  // aStartAngle, aEndAngle
+    false,            // aClockwise
+    0                // aRotation
+  );
+  
+  var points = curve.getPoints( 50 );
+  var geometry = new THREE.BufferGeometry().setFromPoints(points);
+  geometry.rotateX(Math.PI * 0.67);
+  var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+  // Create the final object to add to the scene
+  var ellipse = new THREE.Line(geometry, material);
+  scene.add(ellipse);
 
   scene.add(generateSatellites());
 }
