@@ -4,7 +4,7 @@
 <title>Satellite Tracker by Lucas and Dominik</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-<link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
 <body>
 <div id="overlay">
@@ -13,7 +13,7 @@
   </div>
   <div id="overlay-bottom">
     <div id="timeline">
-      <input type="range" min="0" max="1000" value="0" class="slider" id="timeinput"></input>
+      <input type="range" min="0" max="1000" value="0" class="slider" id="timeinput"/>
     </div>
   </div>
 </div>
@@ -27,11 +27,13 @@
 <!-- satellite js -->
 <script src="libs/satellite.js"></script>
 
+<!-- shaders -->
+<script src="shaders/vertexShader.glsl.js"></script>
+<script src="shaders/fragmentShader.glsl.js"></script>
+
 <!-- general code -->
-<script src="vertexShader.glsl.js"></script>
-<script src="fragmentShader.glsl.js"></script>
-<script src="satellite-manager.js"></script>
-<script src="main.js"></script>
+<script src="scripts/satellite-manager.js"></script>
+<script src="scripts/main.js"></script>
 
 </body>
 </html>
