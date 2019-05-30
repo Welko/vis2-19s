@@ -1,26 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Real-Time Interactive Satellite Tracker</title>
-
-    <link rel="stylesheet" type="text/css" href="styles/style.css">
+<title>Satellite Tracker by Lucas and Dominik</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" type="text/css" href="style.css">
 </head>
-
 <body>
-<!-- Include three.js -->
-<script src="node_modules/three/build/three.js"></script>
-
-<!-- Include sattelite.js -->
-<script src="node_modules/satellite.js/dist/satellite.js"></script>
-
-<h1>Real-Time Interactive Satellite Tracker</h1>
-
-<p>Hello world!</p>
-
-<div id="helloworld_container">
-    <script src="scripts/helloworld.js"></script>
+<div id="overlay">
+  <div id="overlay-top">
+  <div id="branding">Satellite Tracker by Lucas and Dominik</div>
+  </div>
+  <div id="overlay-bottom">
+    <div id="timeline">
+      <input type="range" min="0" max="1000" value="0" class="slider" id="timeinput"></input>
+    </div>
+  </div>
 </div>
+<div id="canvas"></div>
+
+<!-- three js dependencies -->
+<script src="libs/three.min.js"></script>
+<script src="libs/BufferGeometryUtils.js"></script>
+<script src="libs/OrbitControls.js"></script>
+
+<!-- satellite js -->
+<script src="libs/satellite.js"></script>
+
+<!-- general code -->
+<script src="vertexShader.glsl.js"></script>
+<script src="fragmentShader.glsl.js"></script>
+<script src="main.js"></script>
 
 </body>
 </html>
