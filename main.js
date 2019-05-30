@@ -13,6 +13,7 @@ var PARTICLE_SIZE = 4; // remove later
 var clock = new THREE.Clock();
 
 var earth, satellites;
+var satellite_info; //remove later
 
 function init() {
 
@@ -75,6 +76,25 @@ function animate() {
   render();
 }
 
+function updateSatellitePosition(delta, position) {
+
+  for (var i = 0, p = 0; i < satellite_info.length; i+=5, p+=3) {
+
+    satellite_info[i+1] += delta * satellite_info[i+3];
+    satellite_info[i+2] += delta * satellite_info[i+4];
+
+    var r = satellite_info[i];
+    var phi = satellite_info[i+1];
+    var theta = satellite_info[i+2];
+
+    position.array[p] = r * Math.sin(theta) * Math.cos(phi);
+    position.array[p+1] = r * Math.sin(theta) * Math.sin(phi);
+    position.array[p+2] = r * Math.cos(theta);
+  }
+
+  position.needsUpdate = true;
+}
+
 function render() {
   var delta = clock.getDelta();
 
@@ -97,6 +117,8 @@ function render() {
     attributes.size.needsUpdate = true;
     INTERSECTED = null;
   }
+
+  updateSatellitePosition(delta, geometry.attributes.position);
 
   // render scene
   renderer.render(scene, camera);
@@ -132,18 +154,26 @@ function generateSatellites() {
   var positions = [];
   var colors = [];
   var sizes = [];
+
+  satellite_info = [];
+  
   var color = new THREE.Color();
   
   var min_r = 30;
   var max_r = 40;
   var max_phi = 2*Math.PI;
   var max_theta = Math.PI;
+  var max_angular_speed = 0.01 * Math.PI * 2;
 
   for ( var i = 0; i < particles; i ++ ) {
     // positions
     var r = Math.random() * (max_r - min_r) + min_r;
     var phi = Math.random() * max_phi;
     var theta = Math.random() * max_theta;
+
+    var velocity_phi = ((Math.random() * 2) - 1) * max_angular_speed;
+    var velocity_theta = ((Math.random() * 2) - 1) * max_angular_speed;
+    satellite_info.push(r, phi, theta, velocity_phi, velocity_theta);
 
     var x = r * Math.sin(theta) * Math.cos(phi);
     var y = r * Math.sin(theta) * Math.sin(phi);
@@ -159,10 +189,10 @@ function generateSatellites() {
     sizes.push(PARTICLE_SIZE);
   }
 
-  geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-  geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-  geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
-  geometry.computeBoundingSphere();
+  geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3).setDynamic(true));
+  geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3).setDynamic(true));
+  geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
+  geometry.computeBoundingSphere(); // used?
   //
   // var material = new THREE.PointsMaterial({ 
   //   size: 1, 
@@ -172,7 +202,7 @@ function generateSatellites() {
   var material = new THREE.ShaderMaterial( {
     uniforms: {
       mainColor: { value: new THREE.Color( 0xffffff ) },
-      texture: { value: new THREE.TextureLoader().load( "circle.png" ) }
+      texture: { value: new THREE.TextureLoader().load("circle.png") }
     },
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
