@@ -1,14 +1,10 @@
-function fillSceneObjects(scene) {
+function fillSceneWithObjects(scene) {
     // grid
     scene.add(new THREE.GridHelper(1000, 10));
     scene.add(new THREE.PolarGridHelper(100, 36, 10, 64, 0xcc5555, 0xcc5555));
 
     // earth
-    var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
-    earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
-    var earth_material = new THREE.MeshStandardMaterial({color: 0xff0000});
-    earth = new THREE.Mesh(earth_geometry, earth_material);
-    scene.add(earth);
+    fillSceneWithEarth();
 
     // moon
     var moon_geometry = new THREE.SphereGeometry( 1, 48, 24 );

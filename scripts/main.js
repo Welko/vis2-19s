@@ -7,13 +7,17 @@ var camera, scene, renderer;
 var cameraControls;
 var satellite_nameplate;
 
-var mouse, mouse_screen, raycaster, intersects, INTERSECTED;
+var mouse, mouse_screen, raycaster;
 
 var PARTICLE_SIZE = 2; // TODO remove later
 
 var clock = new THREE.Clock();
 
 var earth, moon;
+
+// Flags
+let f_ctrl_down = false;
+let f_ctrl_drag = false;
 
 function init() {
 
@@ -42,22 +46,17 @@ function init() {
 
   // events
   window.addEventListener('resize', onWindowResize, false);
+  document.addEventListener('keyup', onKeyUp, false);
   document.addEventListener('keydown', onKeyDown, false);
-  document.addEventListener('mousemove', onDocumentMouseMove, false);
+  document.addEventListener('mousedown', onMouseDown, false);
+  document.addEventListener('mouseup', onMouseUp, false);
+    document.addEventListener('mousemove', onMouseMove, false);
 
   // controls
   cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
   cameraControls.update();
 
   fillScene();
-}
-
-function onDocumentMouseMove(event) {
-  event.preventDefault();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-  mouse_screen.x = event.clientX;
-  mouse_screen.y = event.clientY;
 }
 
 function onWindowResize(event) {
@@ -67,12 +66,50 @@ function onWindowResize(event) {
 }
 
 function onKeyDown(event) {
-  switch(event.keyCode) {
-    // quick page reload by pressing "R"
-    case 82:
-      location.reload(); 
-      break;
+    switch(event.keyCode) {
+        case 17: // CTRL (sketch on earth)
+            f_ctrl_down = true;
+            break;
+
+        case 82: // R (quick page reload)
+            location.reload();
+            break;
+    }
+}
+
+function onKeyUp(event) {
+  switch (event.keyCode) {
+      case 17: // CTRL (sketch on earth)
+          f_ctrl_down = false;
+          break;
   }
+}
+
+function onMouseDown(event) {
+  switch (event.button) {
+      case 0: // Left mouse button
+          if (f_ctrl_down) {
+            cameraControls.enabled = false;
+              f_ctrl_drag = true;
+          }
+  }
+}
+
+function onMouseUp(event) {
+    f_ctrl_drag = false;
+    cameraControls.enabled = true;
+}
+
+function onMouseMove(event) {
+    event.preventDefault();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    mouse_screen.x = event.clientX;
+    mouse_screen.y = event.clientY;
+
+    if (f_ctrl_drag) {
+      console.log("Control dragging!");
+    }
 }
 
 function animate() {
@@ -86,34 +123,8 @@ function render() {
   cameraControls.update(delta);
 
   if (_sats_points != null) {
-    // satellite raycast (change size)
-    let geometry = _sats_points.geometry;
-    let attributes = geometry.attributes;
     raycaster.setFromCamera(mouse, camera);
-    intersects = raycaster.intersectObject(_sats_points);
-    if (intersects.length > 0) {
-
-      // selected new satellite
-      if (INTERSECTED !== intersects[0].index) {
-
-        // reset old satellite
-        attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
-
-        // change new satellite
-        INTERSECTED = intersects[0].index;
-        attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 1.5;
-        attributes.size.needsUpdate = true;
-
-        satellite_nameplate.innerHTML = _sats[INTERSECTED].name;
-        satellite_nameplate.style.left = mouse_screen.x + "px";
-        satellite_nameplate.style.top = mouse_screen.y + "px";
-      }
-    } else if (INTERSECTED !== null) {
-      attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
-      attributes.size.needsUpdate = true;
-      INTERSECTED = null;
-      satellite_nameplate.innerHTML = "";
-    }
+    intersectSatellites(raycaster);
 
     updateSatellites(delta);
   }
@@ -134,7 +145,7 @@ function fillScene() {
   let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
   scene.add(directionalLight);
 
-  fillSceneObjects(scene);
+  fillSceneWithObjects(scene);
 
   getSatellites(function() {
     scene.add(_sats_points);

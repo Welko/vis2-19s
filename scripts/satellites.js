@@ -8,9 +8,11 @@ let _sats_points = null;
 
 let _scaling_factor = 0.001;
 
+let intersectedSatellite = null;
+
 function getSatellites(callback) {
     if (areSatellitesGood()) {
-        callback(_satellites);
+        callback();
     } else {
         fetchSatellites(callback);
     }
@@ -166,3 +168,32 @@ let color_satellites = [
     [0.59607843, 0.30588235, 0.63921569]
 ];
 function next_color() { return color_satellites[(++color_satellites_prev) % color_satellites.length] }
+
+function intersectSatellites(raycaster) {
+    let geometry = _sats_points.geometry;
+    let attributes = geometry.attributes;
+    let intersects = raycaster.intersectObject(_sats_points);
+    if (intersects.length > 0) {
+
+        // selected new satellite
+        if (intersectedSatellite !== intersects[0].index) {
+
+            // reset old satellite
+            attributes.size.array[intersectedSatellite] = PARTICLE_SIZE;
+
+            // change new satellite
+            intersectedSatellite = intersects[0].index;
+            attributes.size.array[intersectedSatellite] = PARTICLE_SIZE * 1.5;
+            attributes.size.needsUpdate = true;
+
+            satellite_nameplate.innerHTML = _sats[intersectedSatellite].name;
+            satellite_nameplate.style.left = mouse_screen.x + "px";
+            satellite_nameplate.style.top = mouse_screen.y + "px";
+        }
+    } else if (intersectedSatellite !== null) {
+        attributes.size.array[intersectedSatellite] = PARTICLE_SIZE;
+        attributes.size.needsUpdate = true;
+        intersectedSatellite = null;
+        satellite_nameplate.innerHTML = "";
+    }
+}
