@@ -6,9 +6,13 @@ var container;
 var camera, scene, renderer;
 var cameraControls;
 
+var mouse, raycaster, intersects, INTERSECTED;
+
+var PARTICLE_SIZE = 4; // remove later
+
 var clock = new THREE.Clock();
 
-var earth;
+var earth, satellites;
 
 function init() {
 
@@ -28,9 +32,15 @@ function init() {
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
 
+  // raycasting
+  raycaster = new THREE.Raycaster();
+  raycaster.params.Points.threshold = 0.5;
+  mouse = new THREE.Vector2();
+
   // events
   window.addEventListener('resize', onWindowResize, false);
   document.addEventListener('keydown', onKeyDown, false);
+  document.addEventListener('mousemove', onDocumentMouseMove, false);
 
   // controls
   cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -39,6 +49,11 @@ function init() {
   fillScene();
 }
 
+function onDocumentMouseMove( event ) {
+  event.preventDefault();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+}
 
 function onWindowResize(event) {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -64,6 +79,26 @@ function render() {
   var delta = clock.getDelta();
 
   cameraControls.update(delta);
+
+  // satellite raycast (change size)
+  var geometry = satellites.geometry;
+  var attributes = geometry.attributes;
+  raycaster.setFromCamera( mouse, camera );
+  intersects = raycaster.intersectObject(satellites);
+  if (intersects.length > 0) {
+    if (INTERSECTED != intersects[0].index) {
+      attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
+      INTERSECTED = intersects[0].index;
+      attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 1.5;
+      attributes.size.needsUpdate = true;
+    }
+  } else if (INTERSECTED !== null) {
+    attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
+    attributes.size.needsUpdate = true;
+    INTERSECTED = null;
+  }
+
+  // render scene
   renderer.render(scene, camera);
 }
 
@@ -96,6 +131,7 @@ function generateSatellites() {
   var geometry = new THREE.BufferGeometry();
   var positions = [];
   var colors = [];
+  var sizes = [];
   var color = new THREE.Color();
   
   var min_r = 30;
@@ -119,21 +155,34 @@ function generateSatellites() {
     var vz = ( z / max_r ) + 0.5;
     color.setRGB( vx, vy, vz );
     colors.push( color.r, color.g, color.b );
+
+    sizes.push(PARTICLE_SIZE);
   }
 
   geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
   geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+  geometry.addAttribute( 'size', new THREE.Float32BufferAttribute( sizes, 1 ) );
   geometry.computeBoundingSphere();
   //
-  var material = new THREE.PointsMaterial({ 
-    size: 1, 
-    vertexColors: THREE.VertexColors,
-    map: new THREE.TextureLoader().load( 'circle.png' )} );
+  // var material = new THREE.PointsMaterial({ 
+  //   size: 1, 
+  //   vertexColors: THREE.VertexColors,
+  //   map: new THREE.TextureLoader().load( 'circle.png' )} );
 
-  material.blending = THREE.AdditiveBlending;
+  var material = new THREE.ShaderMaterial( {
+    uniforms: {
+      mainColor: { value: new THREE.Color( 0xffffff ) },
+      texture: { value: new THREE.TextureLoader().load( "circle.png" ) }
+    },
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    alphaTest: 0.9
+  } );
+
+  // material.blending = THREE.AdditiveBlending;
   
-  points = new THREE.Points( geometry, material );
-  return points;
+  satellites = new THREE.Points(geometry, material);
+  return satellites;
 }
 
 window.addEventListener('load', function() {
