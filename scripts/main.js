@@ -8,14 +8,15 @@ var cameraControls;
 
 var mouse, raycaster, intersects, INTERSECTED;
 
-var PARTICLE_SIZE = 4; // remove later
+var PARTICLE_SIZE = 2; // remove later
 
 var clock = new THREE.Clock();
 
 var earth, moon;
 
 var satellites;
-var satellite_info; //remove later
+var satellite_velocities;
+// var satellite_info; //remove later
 
 function init() {
 
@@ -78,19 +79,28 @@ function animate() {
   render();
 }
 
+// function updateSatellitePositionAngular(delta, position) {
+//   for (var i = 0, p = 0; i < satellite_info.length; i+=5, p+=3) {
+
+//     satellite_info[i+1] += delta * satellite_info[i+3];
+//     satellite_info[i+2] += delta * satellite_info[i+4];
+
+//     var r = satellite_info[i];
+//     var phi = satellite_info[i+1];
+//     var theta = satellite_info[i+2];
+
+//     position.array[p] = r * Math.sin(theta) * Math.cos(phi);
+//     position.array[p+1] = r * Math.sin(theta) * Math.sin(phi);
+//     position.array[p+2] = r * Math.cos(theta);
+//   }
+
+//   position.needsUpdate = true;
+// }
+
 function updateSatellitePosition(delta, position) {
-  for (var i = 0, p = 0; i < satellite_info.length; i+=5, p+=3) {
-
-    satellite_info[i+1] += delta * satellite_info[i+3];
-    satellite_info[i+2] += delta * satellite_info[i+4];
-
-    var r = satellite_info[i];
-    var phi = satellite_info[i+1];
-    var theta = satellite_info[i+2];
-
-    position.array[p] = r * Math.sin(theta) * Math.cos(phi);
-    position.array[p+1] = r * Math.sin(theta) * Math.sin(phi);
-    position.array[p+2] = r * Math.cos(theta);
+  var positions = position.array;
+  for (var i = 0, p = 0; i < satellite_velocities.length; i++) {
+    positions[i] += delta * satellite_velocities[i];
   }
 
   position.needsUpdate = true;
@@ -188,16 +198,10 @@ function generateSatellites(callback) {
         let colors = [];
         let sizes = [];
 
-        satellite_info = [];
+        satellite_velocities = [];
 
         let typesCache = [];
         let colorsCache = [];
-
-        var min_r = 30;
-        var max_r = 40;
-        var max_phi = 2*Math.PI;
-        var max_theta = Math.PI;
-        var max_angular_speed = 0.01 * Math.PI * 2;
 
         for (let i = 0; i < sats.length; i++) {
             let sat = sats[i];
@@ -208,18 +212,25 @@ function generateSatellites(callback) {
                 index = typesCache.length - 1;
             }
 
-            positions.push(sat.pos);
+            var f = .001;
+            var x = sat.pos.x * f;
+            var y = sat.pos.z * f;
+            var z = sat.pos.y * f;
+            if (i < 10) console.log(x,y,z);
+            if ( isNaN(x) || isNaN(y) || isNaN(z)) {
+              console.error("NaN in satellite posiion: ", i, x, y, z, sat);
+              x = 0.0;
+              y = 0.0;
+              z = 0.0;
+            }
+
+            positions.push(x,y,z);
             c = colorsCache[index];
             colors.push(c[0], c[1], c[2]);
             sizes.push(PARTICLE_SIZE);
 
-            var r = Math.sqrt(sat.pos.x^2 + sat.pos.y^2 + sat.pos.z^2); //Math.random() * (max_r - min_r) + min_r;
-            var phi = Math.random() * max_phi;
-            var theta = Math.random() * max_theta;
-
-            var velocity_phi = ((Math.random() * 2) - 1) * max_angular_speed;
-            var velocity_theta = ((Math.random() * 2) - 1) * max_angular_speed;
-            satellite_info.push(r, phi, theta, velocity_phi, velocity_theta);
+            f *= 100;
+            satellite_velocities.push(sat.vel.x*f, sat.vel.y*f, sat.vel.z*f);
         }
 
         console.log("Loaded " + typesCache.length + " different types of satellites!");
