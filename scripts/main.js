@@ -5,8 +5,9 @@ var Vector3 = THREE.Vector3;
 var container;
 var camera, scene, renderer;
 var cameraControls;
+var satellite_nameplate;
 
-var mouse, raycaster, intersects, INTERSECTED;
+var mouse, mouse_screen, raycaster, intersects, INTERSECTED;
 
 var PARTICLE_SIZE = 2; // remove later
 
@@ -15,12 +16,14 @@ var clock = new THREE.Clock();
 var earth, moon;
 
 var satellites;
+var satellite_info;
 var satellite_velocities;
 // var satellite_info; //remove later
 
 function init() {
 
   container = document.getElementById('canvas');
+  satellite_nameplate = document.getElementById('satellite-nameplate');
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100000);
@@ -40,6 +43,7 @@ function init() {
   raycaster = new THREE.Raycaster();
   raycaster.params.Points.threshold = 0.5;
   mouse = new THREE.Vector2();
+  mouse_screen = new THREE.Vector2();
 
   // events
   window.addEventListener('resize', onWindowResize, false);
@@ -57,6 +61,8 @@ function onDocumentMouseMove( event ) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  mouse_screen.x = event.clientX;
+  mouse_screen.y = event.clientY;
 }
 
 function onWindowResize(event) {
@@ -112,25 +118,36 @@ function render() {
   cameraControls.update(delta);
 
   if (satellites != null) {
-      // satellite raycast (change size)
-      var geometry = satellites.geometry;
-      var attributes = geometry.attributes;
-      raycaster.setFromCamera(mouse, camera);
-      intersects = raycaster.intersectObject(satellites);
-      if (intersects.length > 0) {
-          if (INTERSECTED !== intersects[0].index) {
-              attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
-              INTERSECTED = intersects[0].index;
-              attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 1.5;
-              attributes.size.needsUpdate = true;
-          }
-      } else if (INTERSECTED !== null) {
-          attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
-          attributes.size.needsUpdate = true;
-          INTERSECTED = null;
-      }
+    // satellite raycast (change size)
+    var geometry = satellites.geometry;
+    var attributes = geometry.attributes;
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObject(satellites);
+    if (intersects.length > 0) {
 
-      updateSatellitePosition(delta, attributes.position);
+      // selected new satellite
+      if (INTERSECTED !== intersects[0].index) {
+
+        // reset old satellite
+        attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
+
+        // change new satellite
+        INTERSECTED = intersects[0].index;
+        attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 1.5;
+        attributes.size.needsUpdate = true;
+
+        satellite_nameplate.innerHTML = satellite_info[INTERSECTED].name;
+        satellite_nameplate.style.left = mouse_screen.x + "px";
+        satellite_nameplate.style.top = mouse_screen.y + "px";
+      }
+    } else if (INTERSECTED !== null) {
+      attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
+      attributes.size.needsUpdate = true;
+      INTERSECTED = null;
+      satellite_nameplate.innerHTML = "";
+    }
+
+    updateSatellitePosition(delta, attributes.position);
   }
 
   // render scene
@@ -199,6 +216,7 @@ function generateSatellites(callback) {
         let sizes = [];
 
         satellite_velocities = [];
+        satellite_info = sats;
 
         let typesCache = [];
         let colorsCache = [];
