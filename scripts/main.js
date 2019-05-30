@@ -57,7 +57,7 @@ function init() {
   fillScene();
 }
 
-function onDocumentMouseMove( event ) {
+function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -78,7 +78,7 @@ function onKeyDown(event) {
       location.reload(); 
       break;
   }
-};
+}
 
 function animate() {
   requestAnimationFrame(animate);
@@ -104,8 +104,8 @@ function animate() {
 // }
 
 function updateSatellitePosition(delta, position) {
-  var positions = position.array;
-  for (var i = 0, p = 0; i < satellite_velocities.length; i++) {
+  let positions = position.array;
+  for (let i = 0; i < satellite_velocities.length; i++) {
     positions[i] += delta * satellite_velocities[i];
   }
 
@@ -113,14 +113,14 @@ function updateSatellitePosition(delta, position) {
 }
 
 function render() {
-  var delta = clock.getDelta();
+    let delta = clock.getDelta();
 
   cameraControls.update(delta);
 
   if (satellites != null) {
     // satellite raycast (change size)
-    var geometry = satellites.geometry;
-    var attributes = geometry.attributes;
+    let geometry = satellites.geometry;
+    let attributes = geometry.attributes;
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObject(satellites);
     if (intersects.length > 0) {
@@ -162,7 +162,7 @@ function fillScene() {
   // lights
   scene.add(new THREE.AmbientLight(0x222222));
 
-  var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+  let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
   scene.add(directionalLight);
 
   // grid
@@ -170,22 +170,22 @@ function fillScene() {
   scene.add(new THREE.PolarGridHelper(100, 36, 10, 64, 0xcc5555, 0xcc5555));
 
   // earth
-  var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
+  let earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
   earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
-  var earth_material = new THREE.MeshStandardMaterial({color: 0xff0000});
+  let earth_material = new THREE.MeshStandardMaterial({color: 0xff0000});
   earth = new THREE.Mesh(earth_geometry, earth_material);
   scene.add(earth);
 
-  // moon
-  var moon_geometry = new THREE.SphereGeometry( 1, 48, 24 );
+  // moonlet
+  let moon_geometry = new THREE.SphereGeometry( 1, 48, 24 );
   moon_geometry.scale(1.7381, 1.7360, 1.7381); // https://en.wikipedia.org/wiki/Moon
   moon_geometry.translate(384.402, 0, 0);
-  var moon_material = new THREE.MeshStandardMaterial({color: 0xdddddd});
+  let moon_material = new THREE.MeshStandardMaterial({color: 0xdddddd});
   moon = new THREE.Mesh(moon_geometry, moon_material);
   scene.add(moon);
 
   // try plotting moon orbit:
-  var curve = new THREE.EllipseCurve(
+  let curve = new THREE.EllipseCurve(
       0,  0,            // ax, aY
       384, 400,           // xRadius, yRadius
       0,  2 * Math.PI,  // aStartAngle, aEndAngle
@@ -193,12 +193,12 @@ function fillScene() {
       0                // aRotation
   );
 
-  var points = curve.getPoints( 50 );
-  var geometry = new THREE.BufferGeometry().setFromPoints(points);
+  let points = curve.getPoints( 50 );
+  let geometry = new THREE.BufferGeometry().setFromPoints(points);
   geometry.rotateX(Math.PI * 0.67);
-  var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+  let material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
   // Create the final object to add to the scene
-  var ellipse = new THREE.Line(geometry, material);
+  let ellipse = new THREE.Line(geometry, material);
   scene.add(ellipse);
 
   //scene.add(generateRandomSatellites());
@@ -226,17 +226,17 @@ function generateSatellites(callback) {
             let index = typesCache.indexOf(sat.type);
             if (index === -1) {
                 typesCache.push(sat.type);
-                colorsCache.push(next_color_pastel());
+                colorsCache.push(next_color());
                 index = typesCache.length - 1;
             }
 
-            var f = .001;
-            var x = sat.pos.x * f;
-            var y = sat.pos.z * f;
-            var z = sat.pos.y * f;
+            let f = .001;
+            let x = sat.pos.x * f;
+            let y = sat.pos.z * f;
+            let z = sat.pos.y * f;
             if (i < 10) console.log(x,y,z);
-            if ( isNaN(x) || isNaN(y) || isNaN(z)) {
-              console.error("NaN in satellite posiion: ", i, x, y, z, sat);
+            if (isNaN(x) || isNaN(y) || isNaN(z)) {
+              console.error("NaN in satellite position: ", i, x, y, z, sat);
               x = 0.0;
               y = 0.0;
               z = 0.0;
@@ -259,7 +259,7 @@ function generateSatellites(callback) {
         geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
         //geometry.computeBoundingSphere();
 
-        var material = new THREE.ShaderMaterial( {
+        let material = new THREE.ShaderMaterial( {
             uniforms: {
                 mainColor: { value: new THREE.Color( 0xffffff ) },
                 texture: { value: new THREE.TextureLoader().load("./resources/circle.png") }
@@ -276,40 +276,40 @@ function generateSatellites(callback) {
 }
 
 function generateRandomSatellites() {
-  var particles = 10000;
-  var geometry = new THREE.BufferGeometry();
-  var positions = [];
-  var colors = [];
-  var sizes = [];
+  let particles = 10000;
+  let geometry = new THREE.BufferGeometry();
+  let positions = [];
+  let colors = [];
+  let sizes = [];
 
   satellite_info = [];
   
-  var color = new THREE.Color();
+  let color = new THREE.Color();
   
-  var min_r = 30;
-  var max_r = 40;
-  var max_phi = 2*Math.PI;
-  var max_theta = Math.PI;
-  var max_angular_speed = 0.01 * Math.PI * 2;
+  let min_r = 30;
+  let max_r = 40;
+  let max_phi = 2*Math.PI;
+  let max_theta = Math.PI;
+  let max_angular_speed = 0.01 * Math.PI * 2;
 
-  for ( var i = 0; i < particles; i ++ ) {
+  for (let i = 0; i < particles; i ++ ) {
     // positions
-    var r = Math.random() * (max_r - min_r) + min_r;
-    var phi = Math.random() * max_phi;
-    var theta = Math.random() * max_theta;
+    let r = Math.random() * (max_r - min_r) + min_r;
+    let phi = Math.random() * max_phi;
+    let theta = Math.random() * max_theta;
 
-    var velocity_phi = ((Math.random() * 2) - 1) * max_angular_speed;
-    var velocity_theta = ((Math.random() * 2) - 1) * max_angular_speed;
+    let velocity_phi = ((Math.random() * 2) - 1) * max_angular_speed;
+    let velocity_theta = ((Math.random() * 2) - 1) * max_angular_speed;
     satellite_info.push(r, phi, theta, velocity_phi, velocity_theta);
 
-    var x = r * Math.sin(theta) * Math.cos(phi);
-    var y = r * Math.sin(theta) * Math.sin(phi);
-    var z = r * Math.cos(theta);
+    let x = r * Math.sin(theta) * Math.cos(phi);
+    let y = r * Math.sin(theta) * Math.sin(phi);
+    let z = r * Math.cos(theta);
     positions.push( x, y, z );
     // colors
-    var vx = ( x / max_r ) + 0.5;
-    var vy = ( y / max_r ) + 0.5;
-    var vz = ( z / max_r ) + 0.5;
+    let vx = ( x / max_r ) + 0.5;
+    let vy = ( y / max_r ) + 0.5;
+    let vz = ( z / max_r ) + 0.5;
     color.setRGB( vx, vy, vz );
     colors.push( color.r, color.g, color.b );
 
@@ -326,7 +326,7 @@ function generateRandomSatellites() {
   //   vertexColors: THREE.VertexColors,
   //   map: new THREE.TextureLoader().load( 'circle.png' )} );
 
-  var material = new THREE.ShaderMaterial( {
+  let material = new THREE.ShaderMaterial( {
     uniforms: {
       mainColor: { value: new THREE.Color( 0xffffff ) },
       texture: { value: new THREE.TextureLoader().load("circle.png") }
@@ -342,15 +342,14 @@ function generateRandomSatellites() {
   return satellites;
 }
 
-let color_pastel_prev = -1;
-let color_pastel = [
+let color_satellites_prev = -1;
+let color_satellites = [
     [0.89411765, 0.10196078, 0.10980392],
     [0.21568627, 0.49411765, 0.72156863],
     [0.30196078, 0.68627451, 0.29019608],
     [0.59607843, 0.30588235, 0.63921569]
 ];
-function next_color_pastel() { return color_pastel[(++color_pastel_prev) % color_pastel.length] }
-function next_color() { return next_color_pastel(); }
+function next_color() { return color_satellites[(++color_satellites_prev) % color_satellites.length] }
 
 window.addEventListener('load', function() {
   init();

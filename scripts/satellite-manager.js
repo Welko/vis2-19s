@@ -1,10 +1,10 @@
 // Source: https://github.com/shashwatak/satellite-js
 
-var satellites = null;
+let _satellites = null;
 
 function getSatellites(callback) {
     if (areSatellitesGood()) {
-        callback(satellites);
+        callback(_satellites);
     } else {
         fetchSatellites(callback);
     }
@@ -24,7 +24,7 @@ function fetchSatellites(callback, address = null) {
 }
 
 function areSatellitesGood() {
-    return satellites != null;
+    return _satellites != null;
 }
 
 function buildSatellites(satList) {
@@ -40,6 +40,8 @@ function buildSatellites(satList) {
             sats.push(sat);
         }
     }
+
+    _satellites = sats;
     return sats;
 }
 
