@@ -184,7 +184,7 @@ function generateSatellites(callback) {
 
             positions.push(sat.pos);
             //colors.push(colorsCache[index]);
-            colors.push(new THREE.Color(0xffffff));
+            colors.push(1.0, 1.0, 1.0);
             sizes.push(PARTICLE_SIZE);
 
             var r = Math.sqrt(sat.pos.x^2 + sat.pos.y^2 + sat.pos.z^2); //Math.random() * (max_r - min_r) + min_r;
