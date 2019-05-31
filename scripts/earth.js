@@ -3,9 +3,9 @@ earth = null;
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
     earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
-    var earth_bump = new THREE.TextureLoader().load('./resources/earth_bump.png');
+    var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
     var earth_material = new THREE.MeshStandardMaterial({
-        map: new THREE.TextureLoader().load('./resources/earth.jpg'),
+        map: null, //new THREE.TextureLoader().load('./resources/earth.jpg'),
         bumpMap: earth_bump,
         bumpScale: 0.1,
         roughnessMap: earth_bump,

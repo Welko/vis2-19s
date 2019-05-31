@@ -1,126 +1,121 @@
 // Source: https://github.com/shashwatak/satellite-js
 
-let _sats = null;
-let _sats_pos = null;
-let _sats_vel = null;
+var SATELLITE_SIZE = 2;
+var ORBIT_SEGMENTS = 255;
+var KM_TO_WORLD_UNITS = 0.001;
 
-let _sats_points = null;
+var tle_json;
+var sat_data;
+var sat_pos;
+var sat_vel;
+var sat_alt;
 
-let _scaling_factor = 0.001;
+var satelliteWorker = new Worker('./scripts/satellite-calculation-worker.js');
+var orbitWorker = new Worker('./scripts/orbit-calculation-worker.js');
 
-let intersectedSatellite = null;
+var time_index = 0;
 
-function getSatellites(callback) {
-    if (areSatellitesGood()) {
-        callback();
-    } else {
-        fetchSatellites(callback);
-    }
+var sat_points = [];
+var sat_orbit_arrays = [];
+var in_progress = [];
+
+var orbit_line;
+var position_projection_line;
+var satellite_transform;
+
+let intersected_satellite = null;
+
+var finished_loading = false;
+
+function loadJSON(callback, path) {   
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('GET', path, true); // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);  
+ }
+
+function startSatelliteLoading(scene) {
+    loadJSON(function(text) { getSatellites(scene, text); }, "./resources/TLE.json");
 }
 
-function fetchSatellites(callback, address = null) {
-    if (address == null) {
-        address = "./resources/TLE.json";
-    }
-    fetch(address)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(satList) {
-            buildSatellites(satList);
-            callback();
+function getSatellites(scene, tle_text) {
+    tle_json = JSON.parse(tle_text);
+
+    var sat_count = tle_json.length;
+
+    sat_data = [];
+    for (var i = 0; i < sat_count; i++) {
+        sat_data.push({
+            intldes:  tle_json[i].INTLDES,// LM: I couldn't find what this means :/
+            name: tle_json[i].OBJECT_NAME,
+            type: tle_json[i].OBJECT_TYPE
         });
+    }
+
+    satellite_transform = new THREE.Matrix4().compose(
+        new THREE.Vector3(), 
+        new THREE.Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), Math.PI * 0.5),
+        new THREE.Vector3(KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS)
+    );
+
+    prepareOrbitBuffers(sat_count);
+    prepareSatellitePoints(sat_data);
+
+    orbit_line.applyMatrix(satellite_transform);
+    scene.add(orbit_line);
+
+    position_projection_line.applyMatrix(satellite_transform);
+    scene.add(position_projection_line);
+
+    satelliteWorker.postMessage({
+        tle_data : tle_json
+    });
+
+    orbitWorker.postMessage({
+        is_init : true,
+        tle_data : tle_json,
+        segments : ORBIT_SEGMENTS
+    });
 }
 
-function areSatellitesGood() {
-    return _sats != null;
-}
-
-// Source: https://github.com/shashwatak/satellite-js
-function buildSatellites(satList) {
-    let now = new Date();
-
-    // Greenwich Mean Sidereal Time: https://en.wikipedia.org/wiki/Sidereal_time#Definition
-    let gmst = satellite.gstime(now);
-
-    let colors = [];
-    let sizes = [];
+function prepareSatellitePoints(sat_data) {
+    
+    let color_satellites_prev = -1;
+    let color_satellites = [
+        [0.89411765, 0.10196078, 0.10980392],
+        [0.21568627, 0.49411765, 0.72156863],
+        [0.30196078, 0.68627451, 0.29019608],
+        [0.59607843, 0.30588235, 0.63921569]
+    ];
+    function next_color() { return color_satellites[(++color_satellites_prev) % color_satellites.length] };
 
     let typesCache = [];
     let colorsCache = [];
 
-    let sats = [];
-    let poss = [];
-    let vels = [];
-    for (let i = 0; i < satList.length; i++) {
+    var sizes = [];
+    var colors = [];
+    for (var i = 0; i < sat_data.length; i++) {
+        sizes.push(SATELLITE_SIZE);
 
-        let sati = satList[i];
-
-        let satrec = satellite.twoline2satrec(sati.TLE_LINE1, sati.TLE_LINE2); // Satellite record
-
-        // ECI: https://en.wikipedia.org/wiki/Earth-centered_inertial
-        let positionAndVelocity_eci = satellite.propagate(satrec, now);
-
-        let posEcf, velEcf;
-        if (!positionAndVelocity_eci.hasOwnProperty('position') ||
-            !positionAndVelocity_eci.hasOwnProperty('velocity') ||
-            isNaN(positionAndVelocity_eci.position.x) ||
-            isNaN(positionAndVelocity_eci.velocity.x) ||
-            typeof positionAndVelocity_eci.position !== "object" ||
-            typeof positionAndVelocity_eci.velocity !== "object"
-        ) {
-            //console.log("Type of position: " + typeof positionAndVelocity_eci.position);
-            //console.log("Is object? " + (typeof positionAndVelocity_eci.position === "object"));
-            posEcf = {x: 0, y: 0, z: 0};
-            velEcf = {x: 0, y: 0, z: 0};
-        } else {
-            posEcf = satellite.eciToEcf(positionAndVelocity_eci.position, gmst);
-            velEcf = satellite.eciToEcf(positionAndVelocity_eci.velocity, gmst);
-
-            posEcf.x *= _scaling_factor;
-            posEcf.y *= _scaling_factor;
-            posEcf.z *= _scaling_factor;
-
-            let f = _scaling_factor * 100;
-            velEcf.x *= f;
-            velEcf.y *= f;
-            velEcf.z *= f;
-        }
-
-        let sat = {
-            intldes:  sati.INTLDES,// LM: I couldn't find what this means :/
-            name: sati.OBJECT_NAME,
-            type: sati.OBJECT_TYPE
-        };
-
-        // Debug TODO: remove
-        if (i < 10) console.log(posEcf.x, posEcf.y, posEcf.z);
-        if (isNaN(posEcf.x) || isNaN(posEcf.y) || isNaN(posEcf.z)) {
-            console.error("NaN in satellite position: ", i, posEcf.x, posEcf.y, posEcf.z, sat);
-            posEcf.x = 0.0;
-            posEcf.y = 0.0;
-            posEcf.z = 0.0;
-        }
-
-        // three.js stuff
-        let index = typesCache.indexOf(sat.type);
+        let index = typesCache.indexOf(sat_data[i].type);
         if (index === -1) {
-            typesCache.push(sat.type);
+            typesCache.push(sat_data[i].type);
             colorsCache.push(next_color());
             index = typesCache.length - 1;
         }
         let c = colorsCache[index];
-
-        sats.push(sat);
-        poss.push(posEcf.x, posEcf.y, posEcf.z);
-        vels.push(velEcf.x, velEcf.y, velEcf.z);
-
+        
         colors.push(c[0], c[1], c[2]);
-        sizes.push(PARTICLE_SIZE);
     }
 
     let geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.Float32BufferAttribute(poss, 3).setDynamic(true));
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
     geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3).setDynamic(true));
     geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
     //geometry.computeBoundingSphere();
@@ -135,68 +130,184 @@ function buildSatellites(satList) {
         alphaTest: 0.9
     } );
 
-    let points = new THREE.Points(geometry, material);
-
-    _sats = sats;
-    _sats_pos = poss;
-    _sats_vel = vels;
-
-    _sats_points = points;
-
-    console.log("Loaded " + _sats.length + " satellites, " + typesCache.length + " types!")
+    sat_points = new THREE.Points(geometry, material);
 }
 
-function updateSatellites(delta) {
-    if (_sats_vel == null || _sats_pos == null) {
-        return;
+function prepareOrbitBuffers(count) {
+
+    in_progress = [];
+    for (var i = 0; i < ORBIT_SEGMENTS; i++) in_progress[i] = false; // fill with false
+    
+    var geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((ORBIT_SEGMENTS+1)*3), 3).setDynamic(true));
+
+    var material = new THREE.LineBasicMaterial({
+        color: 0xaaaaaa,
+        linewidth: 2,
+    });
+
+    orbit_line = new THREE.Line(geometry, material);
+
+
+    geometry = new THREE.BufferGeometry();
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(2*3), 3).setDynamic(true));
+
+    material = new THREE.LineBasicMaterial({
+        color: 0xaaaaaa,
+        linewidth: 2,
+        opacity: 0.75,
+        transparent: true,
+    });
+
+    position_projection_line = new THREE.Line(geometry, material);
+}
+
+function updateOrbitBuffer(sat_id) {
+    if(!in_progress[sat_id]) {
+        orbitWorker.postMessage({
+            is_init : false,
+            sat_id : sat_id
+            });
+        in_progress[sat_id] = true;
+    }
+};
+
+function displayOrbit(sat_id) {
+
+}
+
+var gotExtraData = false;
+satelliteWorker.onmessage = function(m) {
+    ///// 
+    if(!gotExtraData) { // store extra data that comes from crunching     
+    //   var start = performance.now();
+      
+    //   satExtraData = JSON.parse(m.data.extraData);
+      
+    //   for(var i=0; i < satSet.numSats; i++) {
+    //     satData[i].inclination = satExtraData[i].inclination;
+    //     satData[i].eccentricity = satExtraData[i].eccentricity;
+    //     satData[i].raan = satExtraData[i].raan;
+    //     satData[i].argPe = satExtraData[i].argPe;
+    //     satData[i].meanMotion = satExtraData[i].meanMotion;
+        
+    //     satData[i].semiMajorAxis = satExtraData[i].semiMajorAxis;
+    //     satData[i].semiMinorAxis = satExtraData[i].semiMinorAxis;
+    //     satData[i].apogee = satExtraData[i].apogee;
+    //     satData[i].perigee = satExtraData[i].perigee;
+    //     satData[i].period = satExtraData[i].period;
+    //   }
+      
+    //   console.log('sat.js copied extra data in ' + (performance.now() - start) + ' ms');
+      gotExtraData = true;
+      return;
     }
 
-    let position = _sats_points.geometry.attributes.position;
+    sat_pos = new Float32Array(m.data.sat_pos);
+    sat_vel = new Float32Array(m.data.sat_vel);
+    sat_alt = new Float32Array(m.data.sat_alt);
+
+    if (!finished_loading) {
+        finished_loading = true;
+
+        sat_points.applyMatrix(satellite_transform);
+        scene.add(sat_points); 
+
+
+
+        // var color = sat_points.geometry.attributes.color;
+        // for (var i = 0; i < sat_alt.length; i++) {
+        //     color.array[i*3] = sat_alt[i] * 0.000025;
+        //     color.array[i*3+1] = 0.5;
+        //     color.array[i*3+2] = 0.5;
+        // }
+        // color.needsUpdate = true;
+    }
+
+    var position = sat_points.geometry.attributes.position;
+    position.copyArray(sat_pos);
+    position.needsUpdate = true;
+};
+
+orbitWorker.onmessage = function(m) {
+    var sat_id = m.data.sat_id;
+    var orbit_points = new Float32Array(m.data.orbit_points);
+
+    var position = orbit_line.geometry.attributes.position;
+    position.copyArray(orbit_points);
+    position.needsUpdate = true;
+
+    in_progress[sat_id] = false;
+};
+
+function updateSatellites(delta) {
+    if (!finished_loading) return;
+
+    let position = sat_points.geometry.attributes.position;
     let positions = position.array;
-    for (let i = 0; i < _sats_vel.length; i++) {
-        positions[i] += delta * _sats_vel[i];
+    for (let i = 0; i < sat_vel.length; i++) {
+        positions[i] += delta * sat_vel[i];
     }
 
     position.needsUpdate = true;
+
+    if (intersected_satellite != null) {
+        var projs = position_projection_line.geometry.attributes.position;
+        projs.array[0] = positions[intersected_satellite*3];
+        projs.array[1] = positions[intersected_satellite*3+1];
+        projs.array[2] = positions[intersected_satellite*3+2];
+        projs.needsUpdate = true;
+    }
 }
 
-let color_satellites_prev = -1;
-let color_satellites = [
-    [0.89411765, 0.10196078, 0.10980392],
-    [0.21568627, 0.49411765, 0.72156863],
-    [0.30196078, 0.68627451, 0.29019608],
-    [0.59607843, 0.30588235, 0.63921569]
-];
-function next_color() { return color_satellites[(++color_satellites_prev) % color_satellites.length] }
+function resetSatellite(sat_id, scene, sizes) {
+    sizes.array[sat_id] = SATELLITE_SIZE;
+    sizes.needsUpdate = true;
+}
 
-function intersectSatellites(raycaster) {
-    let geometry = _sats_points.geometry;
-    let attributes = geometry.attributes;
-    let intersects = raycaster.intersectObject(_sats_points);
+function highlightSatellite(sat_id, scene, sizes) {
+    updateOrbitBuffer(sat_id);
+    displayOrbit(sat_id);
+
+    sizes.array[sat_id] = SATELLITE_SIZE * 1.5;
+    sizes.needsUpdate = true;
+    
+    satellite_nameplate.innerHTML = sat_data[intersected_satellite].name;
+    satellite_nameplate.style.left = mouse_screen.x + "px";
+    satellite_nameplate.style.top = mouse_screen.y + "px";
+    satellite_nameplate.style.display = "inherit";
+}
+
+function unselectSatellites() {
+    satellite_nameplate.innerHTML = "";
+    satellite_nameplate.style.display = "none";
+}
+
+function intersectSatellites(raycaster, scene) {
+    if (!finished_loading) return false;
+
+    var geometry = sat_points.geometry;
+    var attributes = geometry.attributes;
+    var intersects = raycaster.intersectObject(sat_points);
+
     if (intersects.length > 0) {
         // selected new satellite
-        if (intersectedSatellite !== intersects[0].index) {
+        if (intersected_satellite !== intersects[0].index) {
 
-            // reset old satellite
-            attributes.size.array[intersectedSatellite] = PARTICLE_SIZE;
+             // reset old satellite
+            resetSatellite(intersected_satellite, scene, attributes.size);
 
             // change new satellite
-            intersectedSatellite = intersects[0].index;
-            attributes.size.array[intersectedSatellite] = PARTICLE_SIZE * 1.5;
-            attributes.size.needsUpdate = true;
-
-            satellite_nameplate.innerHTML = _sats[intersectedSatellite].name;
-            satellite_nameplate.style.left = mouse_screen.x + "px";
-            satellite_nameplate.style.top = mouse_screen.y + "px";
+            intersected_satellite = intersects[0].index;
+            highlightSatellite(intersected_satellite, scene, attributes.size)
         }
         return true;
 
-    } else if (intersectedSatellite !== null) {
-        attributes.size.array[intersectedSatellite] = PARTICLE_SIZE;
-        attributes.size.needsUpdate = true;
-        intersectedSatellite = null;
-        satellite_nameplate.innerHTML = "";
-        // TODO make nameplate invisible
+    } else if (intersected_satellite !== null) {
+        resetSatellite(intersected_satellite, scene, attributes.size);
+        unselectSatellites();
+
+        intersected_satellite = null;
     }
 
     return false;

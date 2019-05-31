@@ -2,6 +2,8 @@
 var Matrix4 = THREE.Matrix4;
 var Vector3 = THREE.Vector3;
 
+var KM_TO_WORLD_UNITS = 0.001;
+
 var container;
 var camera, scene, renderer;
 var cameraControls;
@@ -9,11 +11,7 @@ var satellite_nameplate;
 
 var mouse, mouse_screen, raycaster;
 
-var PARTICLE_SIZE = 2; // TODO remove later
-
 var clock = new THREE.Clock();
-
-var earth, moon;
 
 // Flags
 let f_ctrl_down = false;
@@ -40,7 +38,6 @@ function init() {
 
   // raycasting
   raycaster = new THREE.Raycaster();
-  raycaster.params.Points.threshold = 0.5;
   mouse = new THREE.Vector2();
   mouse_screen = new THREE.Vector2();
 
@@ -50,7 +47,7 @@ function init() {
   document.addEventListener('keydown', onKeyDown, false);
   document.addEventListener('mousedown', onMouseDown, false);
   document.addEventListener('mouseup', onMouseUp, false);
-    document.addEventListener('mousemove', onMouseMove, false);
+  document.addEventListener('mousemove', onMouseMove, false);
 
   // controls
   cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -117,19 +114,21 @@ function render() {
   let delta = clock.getDelta();
 
   cameraControls.update(delta);
-  raycaster.setFromCamera(mouse, camera)
+  raycaster.setFromCamera(mouse, camera);
+  // threshold depeniding on distance
+  raycaster.params.Points.threshold = Math.pow(camera.position.lengthSq(), 0.6)*0.005;
 
   let plsIntersect = true; // Please intersect!
 
-  if (plsIntersect && f_ctrl_drag && _earth != null) {
+  if (plsIntersect && f_ctrl_drag && earth != null) {
     plsIntersect = ! intersectEarth(raycaster);
   }
 
-  if (plsIntersect && _sats_points != null) {
-    plsIntersect = ! intersectSatellites(raycaster);
+  if (plsIntersect && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
+    plsIntersect = ! intersectSatellites(raycaster, scene);
   }
 
-    updateSatellites(delta);
+  updateSatellites(delta);
 
   // render scene
   renderer.render(scene, camera);
@@ -137,10 +136,8 @@ function render() {
 
 function fillScene() {
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x050505, 2000, 3500);
+  // scene.fog = new THREE.Fog(0x050505, 2000, 3500);
   scene.add(camera);
-
-  scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 
   // lights
   scene.add(new THREE.AmbientLight(0x222222));
@@ -149,9 +146,7 @@ function fillScene() {
 
   fillSceneWithObjects(scene);
 
-  getSatellites(function() {
-    scene.add(_sats_points);
-  });
+  startSatelliteLoading(scene);
 }
 
 window.addEventListener('load', function() {

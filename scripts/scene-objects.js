@@ -1,7 +1,17 @@
 function fillSceneWithObjects(scene) {
     // grid
-    scene.add(new THREE.GridHelper(1000, 10));
-    scene.add(new THREE.PolarGridHelper(100, 36, 10, 64, 0xcc5555, 0xcc5555));
+    var grid = new THREE.GridHelper(1000, 10, 0x666666, 0x333333);
+    grid.material.opacity = 0.5;
+    grid.material.transparent = true,
+    scene.add(grid);
+    
+    var polar_grid = new THREE.PolarGridHelper(200, 16, 20, 64, 0x666666, 0x666666);
+    polar_grid.material.opacity = 0.5;
+    polar_grid.material.transparent = true,
+    scene.add(polar_grid);
+
+    var axesHelper = new THREE.AxesHelper(100);
+    scene.add( axesHelper );
 
     // earth
     fillSceneWithEarth(scene);
