@@ -6,6 +6,7 @@ var KM_TO_WORLD_UNITS = 0.001;
 
 var tle_json;
 var sat_data;
+var sat_extra;
 var sat_pos;
 var sat_vel;
 var sat_alt;
@@ -23,7 +24,11 @@ var orbit_line;
 var position_projection_line;
 var satellite_transform;
 
-let intersected_satellite = null;
+var intersected_satellite = null;
+var selected_satellite = null;
+var selected_satellites = {};
+var orbit_selection_group = null;
+var selected_orbit_material;
 
 var finished_loading = false;
 
@@ -72,6 +77,9 @@ function getSatellites(scene, tle_text) {
 
     position_projection_line.applyMatrix(satellite_transform);
     scene.add(position_projection_line);
+
+    orbit_selection_group = new THREE.Group();
+    scene.add(orbit_selection_group);
 
     satelliteWorker.postMessage({
         tle_data : tle_json
@@ -142,8 +150,14 @@ function prepareOrbitBuffers(count) {
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((ORBIT_SEGMENTS+1)*3), 3).setDynamic(true));
 
     var material = new THREE.LineBasicMaterial({
-        color: 0xaaaaaa,
+        color: 0xffffff,
         linewidth: 2,
+    });
+
+    selected_orbit_material = new THREE.LineBasicMaterial({
+        color: 0xaaaaaa,
+        opacity: 0.75,
+        transparent: true,
     });
 
     orbit_line = new THREE.Line(geometry, material);
@@ -153,7 +167,7 @@ function prepareOrbitBuffers(count) {
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(2*3), 3).setDynamic(true));
 
     material = new THREE.LineBasicMaterial({
-        color: 0xaaaaaa,
+        color: 0xffffff,
         linewidth: 2,
         opacity: 0.75,
         transparent: true,
@@ -176,30 +190,12 @@ function displayOrbit(sat_id) {
 
 }
 
-var gotExtraData = false;
+var got_extra_data = false;
 satelliteWorker.onmessage = function(m) {
-    ///// 
-    if(!gotExtraData) { // store extra data that comes from crunching     
-    //   var start = performance.now();
-      
-    //   satExtraData = JSON.parse(m.data.extraData);
-      
-    //   for(var i=0; i < satSet.numSats; i++) {
-    //     satData[i].inclination = satExtraData[i].inclination;
-    //     satData[i].eccentricity = satExtraData[i].eccentricity;
-    //     satData[i].raan = satExtraData[i].raan;
-    //     satData[i].argPe = satExtraData[i].argPe;
-    //     satData[i].meanMotion = satExtraData[i].meanMotion;
-        
-    //     satData[i].semiMajorAxis = satExtraData[i].semiMajorAxis;
-    //     satData[i].semiMinorAxis = satExtraData[i].semiMinorAxis;
-    //     satData[i].apogee = satExtraData[i].apogee;
-    //     satData[i].perigee = satExtraData[i].perigee;
-    //     satData[i].period = satExtraData[i].period;
-    //   }
-      
-    //   console.log('sat.js copied extra data in ' + (performance.now() - start) + ' ms');
-      gotExtraData = true;
+
+    if(!got_extra_data) {
+      sat_extra = JSON.parse(m.data.extra_data);
+      got_extra_data = true;
       return;
     }
 
@@ -278,12 +274,70 @@ function highlightSatellite(sat_id, scene, sizes) {
     satellite_nameplate.style.display = "inherit";
 }
 
-function unselectSatellites() {
+function unhighlightSatellites() {
     satellite_nameplate.innerHTML = "";
     satellite_nameplate.style.display = "none";
 }
 
-function intersectSatellites(raycaster, scene) {
+function flipInfo(sat_id) {
+    document.getElementById("info-" + sat_id).classList.toggle('full');
+}
+
+function removeInfo(sat_id) {
+    console.log(sat_id);
+    
+    orbit_selection_group.remove(selected_satellites[sat_id]);
+    selected_satellites[sat_id] = null;
+
+    var reme = document.getElementById("info-" + sat_id);
+    reme.parentElement.removeChild(reme); 
+
+}
+
+function selectSatellite(satellite_info_box) {
+    if (intersected_satellite == null) return;
+    if (selected_satellites[intersected_satellite] != null) return;
+    
+    selected_satellite = intersected_satellite;
+
+    console.log("selected_satellite", selected_satellite);
+
+    var selection_line = orbit_line.clone();
+    selection_line.material = selected_orbit_material;
+    selected_satellites[selected_satellite] = selection_line;
+    orbit_selection_group.add(selection_line);
+
+    var extra = sat_extra[selected_satellite]
+
+    var sat_info = "<div id='info-" + selected_satellite + "' class='satellite-info";
+    if (satellite_info_box.children.length == 0) {
+        sat_info += " full";
+    }
+    sat_info += "'>";
+    sat_info += "<h1>" + sat_data[selected_satellite].name + "</h1>";
+    sat_info += "<div class='info-buttons'>";
+    sat_info += "<button class='flip-button' onclick='flipInfo(" + selected_satellite + ")'></button>";
+    sat_info += "<button class='remove-button' onclick='removeInfo(" + selected_satellite + ")'></button>";
+    sat_info += "</div><table>";
+    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+    sat_info += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
+    sat_info += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
+    sat_info += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
+    sat_info += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
+    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+
+    sat_info += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
+    sat_info += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";
+    sat_info += "<tr><td>Apogee</td><td>" + extra.apogee + "</td></tr>";
+    sat_info += "<tr><td>Perigee</td><td>" + extra.perigee + "</td></tr>";
+    sat_info += "<tr><td>Period</td><td>" + extra.period + "</td></tr>";
+    sat_info += "</table></div>";
+
+    satellite_info_box.innerHTML += sat_info;
+}
+
+function intersectSatellites(raycaster, scene, container) {
     if (!finished_loading) return false;
 
     var geometry = sat_points.geometry;
@@ -291,6 +345,9 @@ function intersectSatellites(raycaster, scene) {
     var intersects = raycaster.intersectObject(sat_points);
 
     if (intersects.length > 0) {
+
+        container.style.cursor = "pointer"; 
+
         // selected new satellite
         if (intersected_satellite !== intersects[0].index) {
 
@@ -304,8 +361,11 @@ function intersectSatellites(raycaster, scene) {
         return true;
 
     } else if (intersected_satellite !== null) {
+
+        container.style.cursor = "auto"; 
+
         resetSatellite(intersected_satellite, scene, attributes.size);
-        unselectSatellites();
+        unhighlightSatellites();
 
         intersected_satellite = null;
     }

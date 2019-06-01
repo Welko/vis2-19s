@@ -5,7 +5,6 @@ body {
   font-family: 'Open Sans', sans-serif;
   text-align: center;
   font-weight: 300;
-  font-size: 1em;
 
   background-color: black;
   margin: 0;
@@ -52,6 +51,74 @@ span {
   position: absolute;
   bottom: 0;
   width: 100%;
+}
+
+#selection-box {
+  padding: 1em;
+}
+
+.satellite-info {
+  background-color: #575555b0;
+  padding: 0.5em;
+  margin-top: 0.5em;
+  position: relative;
+}
+
+.satellite-info h1 {
+  font-size: 1em;
+  margin: 0;
+  display: inline-block;
+}
+
+.satellite-info table {
+  font-size: 0.8em;
+  border-spacing: 5px;
+  display: none;
+}
+
+.satellite-info.full table {
+  display: block;
+}
+
+.info-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2em;
+}
+
+.info-buttons button {
+  border: 0;
+  border-radius: 0;
+  color: #a5a5a5;
+  background-color: transparent;
+  height: 100%;
+}
+
+.flip-button::before {
+  content: "▼";
+}
+
+.satellite-info.full .flip-button::before {
+  content: "▲";
+}
+
+.remove-button {
+  background-color: #c1c1c11a;
+}
+
+.remove-button::before {
+  content: "×";
+}
+
+#overlay-right {
+  background-color: #3f3f3fc7;
+  height: 100%;
+  width: 18em;
+  right: 0;
+  left: auto;
+  position: absolute;
+  text-align: left;
 }
 
 #canvas {

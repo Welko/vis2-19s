@@ -8,6 +8,7 @@ var container;
 var camera, scene, renderer;
 var cameraControls;
 var satellite_nameplate;
+var satellite_info_box;
 
 var mouse, mouse_screen, raycaster;
 
@@ -21,6 +22,7 @@ function init() {
 
   container = document.getElementById('canvas');
   satellite_nameplate = document.getElementById('satellite-nameplate');
+  satellite_info_box = document.getElementById('satellite-info-box');
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100000);
@@ -85,6 +87,7 @@ function onKeyUp(event) {
 function onMouseDown(event) {
   switch (event.button) {
       case 0: // Left mouse button
+          selectSatellite(satellite_info_box);
           if (f_ctrl_down) {
             cameraControls.enabled = false;
               f_ctrl_drag = true;
@@ -125,7 +128,7 @@ function render() {
   }
 
   if (plsIntersect && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
-    plsIntersect = ! intersectSatellites(raycaster, scene);
+    plsIntersect = ! intersectSatellites(raycaster, scene, container);
   }
 
   updateSatellites(delta);

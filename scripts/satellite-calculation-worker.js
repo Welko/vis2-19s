@@ -14,23 +14,25 @@ onmessage = function(m) {
   var extra_data = [];
   for(var i = 0; i < len; i++) {
     var extra = {};
-    tle_cache.push(satellite.twoline2satrec(
+    var satrec = satellite.twoline2satrec(
         tle_data[i].TLE_LINE1, tle_data[i].TLE_LINE2
-    ));
+    );
+
+    tle_cache.push(satrec);
     
     // //keplerian elements
-    // extra.inclination  = satrec.inclo;  //rads
-    // extra.eccentricity = satrec.ecco;
-    // extra.raan         = satrec.nodeo;   //rads
-    // extra.argPe        = satrec.argpo;  //rads
-    // extra.meanMotion   = satrec.no * 60 * 24 / (2 * Math.PI);     // convert rads/minute to rev/day
+    extra.inclination  = satrec.inclo;  //rads
+    extra.eccentricity = satrec.ecco;
+    extra.raan         = satrec.nodeo;   //rads
+    extra.argPe        = satrec.argpo;  //rads
+    extra.meanMotion   = satrec.no * 60 * 24 / (2 * Math.PI);     // convert rads/minute to rev/day
     
-    // //fun other data
-    // extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2/3));
-    // extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));   
-    // extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
-    // extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
-    // extra.period = 1440.0 / extra.meanMotion;
+    //fun other data
+    extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, (2/3));
+    extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));   
+    extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - 6371;
+    extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - 6371;
+    extra.period = 1440.0 / extra.meanMotion;
     
     extra_data.push(extra);
   }
