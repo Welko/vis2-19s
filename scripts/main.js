@@ -23,6 +23,9 @@ function init() {
   container = document.getElementById('canvas');
   satellite_nameplate = document.getElementById('satellite-nameplate');
   satellite_info_box = document.getElementById('satellite-info-box');
+  var color_info = document.getElementById('color-info');
+  var color_select = document.getElementById('color-select');
+  color_select.addEventListener('change', function() { changeSatelliteColors(color_select.value, color_info); }, false);
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100000);

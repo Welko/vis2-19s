@@ -19,6 +19,7 @@ var time_index = 0;
 var sat_points = [];
 var sat_orbit_arrays = [];
 var in_progress = [];
+var type_colors = null;
 
 var orbit_line;
 var position_projection_line;
@@ -47,6 +48,71 @@ function loadJSON(callback, path) {
 
 function startSatelliteLoading(scene) {
     loadJSON(function(text) { getSatellites(scene, text); }, "./resources/TLE.json");
+}
+
+function addColor(color, descr) {
+    var row = "<tr><td style='width: 5em; background-color: #" + color.getHexString() + ";'></td>";
+    row += "<td>" + descr + "</td></tr>";
+    return row;
+}
+
+function changeSatelliteColors(value, table) {
+    if (!finished_loading) return;
+    
+    table.innerHTML = "";
+    var new_content = "";
+    var colors = sat_points.geometry.attributes.color;
+
+    var range_colors = [
+        new THREE.Color(0xffffb2),
+        new THREE.Color(0xfecc5c),
+        new THREE.Color(0xfd8d3c),
+        new THREE.Color(0xf03b20),
+        new THREE.Color(0xbd0026)
+    ];
+
+    if (value == "altitude" || value == "distance") { // DOES NOT UPDATE continously!
+
+        var range = [];
+        if (value == "distance") {
+            for (var i = 0; i < sat_alt.length; i++) {
+                var x = sat_pos[i*3];
+                var y = sat_pos[i*3+1];
+                var z = sat_pos[i*3+2];
+                range.push(Math.sqrt(x*x + y*y + z*z));
+            }
+        } else {
+            range = sat_alt;
+        }
+
+        for(var i = 0; i < range.length; i++) {
+            var d = range[i];
+            var r = Math.min(Math.floor(d / 10000), range_colors.length-1);
+            var color = range_colors[r];
+
+            colors.array[i*3] = color.r,
+            colors.array[i*3+1] = color.g;
+            colors.array[i*3+2] = color.b;
+        }
+
+        for (var i = 0; i < range_colors.length; i++) {
+            var min = (i * 10000) + "";
+            var max = (((i+1) * 10000)) + "";
+            if (i == range_colors.length-1) max = "Infinity";
+            new_content += addColor(range_colors[i], "[" + min + " - " + max + "[ km");
+        }
+
+    } else if (value == "type") {
+        colors.copyArray(type_colors);
+
+        for (var i = 0; i < typesCache.length; i++) {
+            new_content += addColor(colorsCache[i], typesCache[i]);
+        }
+    }
+
+    table.innerHTML = new_content;
+
+    colors.needsUpdate = true;
 }
 
 function getSatellites(scene, tle_text) {
@@ -92,19 +158,24 @@ function getSatellites(scene, tle_text) {
     });
 }
 
+var typesCache = [];
+var colorsCache = [];
 function prepareSatellitePoints(sat_data) {
     
     let color_satellites_prev = -1;
+
+    //http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=8
     let color_satellites = [
-        [0.89411765, 0.10196078, 0.10980392],
-        [0.21568627, 0.49411765, 0.72156863],
-        [0.30196078, 0.68627451, 0.29019608],
-        [0.59607843, 0.30588235, 0.63921569]
+        new THREE.Color(0xe41a1c),
+        new THREE.Color(0x377eb8),
+        new THREE.Color(0x4daf4a),
+        new THREE.Color(0x984ea3),
+        new THREE.Color(0xff7f00),
+        new THREE.Color(0xffff33),
+        new THREE.Color(0xa65628),
+        new THREE.Color(0xf781bf)
     ];
     function next_color() { return color_satellites[(++color_satellites_prev) % color_satellites.length] };
-
-    let typesCache = [];
-    let colorsCache = [];
 
     var sizes = [];
     var colors = [];
@@ -119,12 +190,14 @@ function prepareSatellitePoints(sat_data) {
         }
         let c = colorsCache[index];
         
-        colors.push(c[0], c[1], c[2]);
+        colors.push(c.r, c.g, c.b);
     }
+
+    type_colors = new Float32Array(colors);
 
     let geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
-    geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3).setDynamic(true));
+    geometry.addAttribute('color', new THREE.Float32BufferAttribute(type_colors, 3).setDynamic(true));
     geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
     //geometry.computeBoundingSphere();
 
@@ -204,20 +277,13 @@ satelliteWorker.onmessage = function(m) {
     sat_alt = new Float32Array(m.data.sat_alt);
 
     if (!finished_loading) {
+
         finished_loading = true;
 
         sat_points.applyMatrix(satellite_transform);
         scene.add(sat_points); 
 
-
-
-        // var color = sat_points.geometry.attributes.color;
-        // for (var i = 0; i < sat_alt.length; i++) {
-        //     color.array[i*3] = sat_alt[i] * 0.000025;
-        //     color.array[i*3+1] = 0.5;
-        //     color.array[i*3+2] = 0.5;
-        // }
-        // color.needsUpdate = true;
+        changeSatelliteColors("type", document.getElementById('color-info')); // call once so the text ist written
     }
 
     var position = sat_points.geometry.attributes.position;
@@ -284,8 +350,6 @@ function flipInfo(sat_id) {
 }
 
 function removeInfo(sat_id) {
-    console.log(sat_id);
-    
     orbit_selection_group.remove(selected_satellites[sat_id]);
     selected_satellites[sat_id] = null;
 
@@ -297,10 +361,8 @@ function removeInfo(sat_id) {
 function selectSatellite(satellite_info_box) {
     if (intersected_satellite == null) return;
     if (selected_satellites[intersected_satellite] != null) return;
-    
-    selected_satellite = intersected_satellite;
 
-    console.log("selected_satellite", selected_satellite);
+    selected_satellite = intersected_satellite;
 
     var selection_line = orbit_line.clone();
     selection_line.material = selected_orbit_material;

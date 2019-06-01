@@ -57,6 +57,15 @@ span {
   padding: 1em;
 }
 
+.hidden {
+  display: none;
+}
+
+table {
+  font-size: 0.8em;
+  border-spacing: 5px;
+}
+
 .satellite-info {
   background-color: #575555b0;
   padding: 0.5em;
