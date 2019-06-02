@@ -28,7 +28,7 @@ function init() {
   color_select.addEventListener('change', function() { changeSatelliteColors(color_select.value, color_info); }, false);
 
   // camera
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 100000);
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
   camera.position.set(-40, 85, -5);
 
   // renderer
@@ -90,10 +90,11 @@ function onKeyUp(event) {
 function onMouseDown(event) {
   switch (event.button) {
       case 0: // Left mouse button
-          selectSatellite(satellite_info_box);
           if (f_ctrl_down) {
             cameraControls.enabled = false;
               f_ctrl_drag = true;
+          } else {
+            selectSatellite(satellite_info_box);
           }
   }
 }

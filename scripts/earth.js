@@ -1,11 +1,13 @@
 earth = null;
 
+var selection_cone;
+
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
     earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
     var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
     var earth_material = new THREE.MeshStandardMaterial({
-        map: null, //new THREE.TextureLoader().load('./resources/earth.jpg'),
+        map: new THREE.TextureLoader().load('./resources/earth.jpg'),
         bumpMap: earth_bump,
         bumpScale: 0.1,
         roughnessMap: earth_bump,
@@ -14,6 +16,26 @@ function fillSceneWithEarth(scene) {
     earth = new THREE.Mesh(earth_geometry, earth_material);
 
     scene.add(earth);
+
+    generateSelectionCone();
+}
+
+function generateSelectionCone() {
+    var h = 10000000;
+    var r_ratio = 0.1; // find correct value!
+    var r = h * r_ratio;
+    var geometry = new THREE.ConeBufferGeometry(r, h, 128, 1, true);
+    var material = new THREE.MeshBasicMaterial( {
+        color: 0xffff00,
+        opacity: 0.2,
+        transparent: true,
+        side: THREE.DoubleSide
+    } );
+
+    geometry.translate(0, h * -0.5, 0); 
+    geometry.rotateX(Math.PI*.5);
+
+    selection_cone = new THREE.Mesh(geometry, material);
 }
 
 function intersectEarth(raycaster) {
@@ -25,6 +47,13 @@ function intersectEarth(raycaster) {
 
     if (intersects.length > 0) {
         console.log("Intersected!");
+
+        var rot = new Matrix4().lookAt(new THREE.Vector3(), intersects[0].point, new THREE.Vector3(0, 1, 0));
+        selection_cone.setRotationFromMatrix(rot);
+
+        scene.add(selection_cone);
+    } else {
+        scene.remove(selection_cone);
     }
 
     /*if (intersects.length > 0) {
