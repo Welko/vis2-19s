@@ -9,6 +9,8 @@ var sat_pos;
 var sat_vel;
 var sat_alt;
 
+var sat_coords;
+
 var satelliteWorker = new Worker('./scripts/satellite-calculation-worker.js');
 var orbitWorker = new Worker('./scripts/orbit-calculation-worker.js');
 
@@ -117,12 +119,17 @@ function getSatellites(scene, tle_text) {
     var sat_count = tle_json.length;
 
     sat_data = [];
+    sat_coords = [];
+    var now = new Date();
     for (var i = 0; i < sat_count; i++) {
         sat_data.push({
             intldes:  tle_json[i].INTLDES,// LM: I couldn't find what this means :/
             name: tle_json[i].OBJECT_NAME,
-            type: tle_json[i].OBJECT_TYPE
+            type: tle_json[i].OBJECT_TYPE,
+            tleLine1: tle_json[i].TLE_LINE1,
+            tleLine2: tle_json[i].TLE_LINE2
         });
+        sat_coords.push(getSatelliteCoords(i, now));
     }
 
     satellite_transform = new THREE.Matrix4().compose(
@@ -303,7 +310,9 @@ function updateSatellites(delta) {
 
     let position = sat_points.geometry.attributes.position;
     let positions = position.array;
-    for (let i = 0; i < sat_vel.length; i++) {
+    let now = new Date();
+    for (let i = 0; i < sat_data.length; i++) {
+        //sat_coords[i] = getSatelliteCoords(i, now); // Too slow!
         positions[i] += delta * sat_vel[i];
     }
 
@@ -316,6 +325,8 @@ function updateSatellites(delta) {
         projs.array[2] = positions[intersected_satellite*3+2];
         projs.needsUpdate = true;
     }
+
+    updateSatellitesUi();
 }
 
 function resetSatellite(sat_id, scene, sizes) {
@@ -375,4 +386,47 @@ function intersectSatellites(raycaster, scene, container) {
     }
 
     return false;
+}
+
+function getSatelliteCoordsFromParams(x, y, z, velx, vely, velz, lon, lat, alt) {
+    return {
+        x: x,
+        y: y,
+        z: z,
+
+        velx: velx,
+        vely: vely,
+        velz: velz,
+
+        lon: lat,
+        lat: lon,
+        alt: alt
+    };
+}
+
+function getSatelliteCoords(sat_id, when) {
+    var gmst = satellite.gstime(when);
+    var sat = sat_data[sat_id];
+    var rec = satellite.twoline2satrec(sat.tleLine1, sat.tleLine2);
+
+    var eci = satellite.propagate(rec, when);
+    try {
+        var geo = satellite.eciToGeodetic(eci.position, gmst);
+        return getSatelliteCoordsFromParams(
+            eci.position.x,
+            eci.position.y,
+            eci.position.z,
+
+            eci.velocity.x,
+            eci.velocity.y,
+            eci.velocity.z,
+
+            geo.longitude,
+            geo.latitude,
+            geo.height
+        );
+
+    } catch (e) {
+        return getSatelliteCoordsFromParams(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
 }

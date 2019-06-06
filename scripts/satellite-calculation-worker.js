@@ -65,7 +65,7 @@ function propagate() {
   for(var i = 0; i < tle_cache.length; i++) {
     var m = (j - tle_cache[i].jdsatepoch) * 1440.0; //1440 = minutes_per_day
     var pv = satellite.sgp4(tle_cache[i], m); 
-    var x,y,z,vx,vy,vz,alt;
+    var x,y,z,vx,vy,vz,lat,lon,alt;
     try{
        x = pv.position.x;
        y = pv.position.y;
@@ -75,7 +75,11 @@ function propagate() {
        vz = pv.velocity.z;
 
        if (isNaN(x) || isNaN(y) || isNaN(z)) throw "position contains NaN";
-       alt = satellite.eciToGeodetic(pv.position, gmst).height;
+       var geodetic = satellite.eciToGeodetic(pv.position, gmst);
+       lat = geodetic.latitude;
+       lon = geodetic.longitude;
+       alt = geodetic.height;
+
     } catch(e) {
        x = 0;
        y = 0;
@@ -84,6 +88,8 @@ function propagate() {
        vy = 0;
        vz = 0;
        alt = 0;
+       lat = 0;
+       lon = 0;
     }
 
     sat_pos[i*3] = x;

@@ -14,6 +14,7 @@ function selectSatellite(satellite_info_box) {
     selection_line.material = selected_orbit_material;
     orbit_selection_group.add(selection_line);
 
+    var data = sat_data[selected_satellite_id];
     var extra = sat_extra[selected_satellite_id];
 
     var sat_info = "<div id='info-" + selected_satellite_id + "' class='satellite-info";
@@ -23,19 +24,27 @@ function selectSatellite(satellite_info_box) {
     sat_info += "<button class='flip-button' onclick='flipInfo(" + selected_satellite_id + ")'></button>";
     sat_info += "<button class='remove-button' onclick='removeInfo(" + selected_satellite_id + ")'></button>";
     sat_info += "</div><table>";
-    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-    sat_info += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
-    sat_info += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
-    sat_info += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
-    sat_info += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
-    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
 
-    sat_info += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
-    sat_info += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";
-    sat_info += "<tr><td>Apogee</td><td>" + extra.apogee + "</td></tr>";
-    sat_info += "<tr><td>Perigee</td><td>" + extra.perigee + "</td></tr>";
-    sat_info += "<tr><td>Period</td><td>" + extra.period + "</td></tr>";
+        sat_info += "<tr><td>Type</td><td>" + data.type + "</td></tr>";
+
+        sat_info += "<tr><td>Latitude</td><td id='lat-"+selected_satellite_id+"'></td></tr>";
+        sat_info += "<tr><td>Longitude</td><td id='lon-"+selected_satellite_id+"'></td></tr>";
+        sat_info += "<tr><td>Altitude</td><td id='alt-"+selected_satellite_id+"'></td></tr>";
+
+        sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+        sat_info += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
+        sat_info += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
+        sat_info += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
+        sat_info += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
+        sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+        sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+
+        sat_info += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
+        sat_info += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";
+        sat_info += "<tr><td>Apogee</td><td>" + extra.apogee + "</td></tr>";
+        sat_info += "<tr><td>Perigee</td><td>" + extra.perigee + "</td></tr>";
+        sat_info += "<tr><td>Period</td><td>" + extra.period + "</td></tr>";
+
     sat_info += "</table></div>";
 
     satellite_info_box.innerHTML += sat_info;
@@ -66,4 +75,24 @@ function removeInfo(sat_id) {
 
     var reme = document.getElementById("info-" + sat_id);
     reme.parentElement.removeChild(reme);
+}
+
+function updateSatellitesUi() {
+    for (var i = 0; i < selected_satellites_ids.length; i++) {
+        updateSatelliteUi(i);
+    }
+}
+
+function updateSatelliteUi(index) {
+    var id = selected_satellites_ids[index];
+    var lat = document.getElementById("lat-" + id);
+    var lon = document.getElementById("lon-" + id);
+    var alt = document.getElementById("alt-" + id);
+    var coords = getSatelliteCoords(id, new Date());
+
+    lat.innerHTML = coords.lat;
+    lon.innerHTML = coords.lon;
+    alt.innerHTML = coords.alt;
+
+    console.log("Updated with index " + index + ": lat=" + coords.lat + " lon=" + coords.lon + " alt=" + coords.alt);
 }
