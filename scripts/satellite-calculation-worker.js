@@ -1,4 +1,4 @@
-https://github.com/jeyoder/ThingsInSpace/blob/master/web-root/scripts/sat-cruncher.js
+//https://github.com/jeyoder/ThingsInSpace/blob/master/web-root/scripts/sat-cruncher.js
 /* global satellite */
 importScripts('../libs/satellite.js');
 

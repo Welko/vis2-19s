@@ -1,5 +1,3 @@
-// Source: https://github.com/shashwatak/satellite-js
-
 var SATELLITE_SIZE = 2;
 var ORBIT_SEGMENTS = 255;
 var KM_TO_WORLD_UNITS = 0.001;
@@ -26,8 +24,6 @@ var position_projection_line;
 var satellite_transform;
 
 var intersected_satellite = null;
-var selected_satellite = null;
-var selected_satellites = {};
 var orbit_selection_group = null;
 var selected_orbit_material;
 
@@ -71,10 +67,10 @@ function changeSatelliteColors(value, table) {
         new THREE.Color(0xbd0026)
     ];
 
-    if (value == "altitude" || value == "distance") { // DOES NOT UPDATE continously!
+    if (value === "altitude" || value === "distance") { // DOES NOT UPDATE continuously!
 
         var range = [];
-        if (value == "distance") {
+        if (value === "distance") {
             for (var i = 0; i < sat_alt.length; i++) {
                 var x = sat_pos[i*3];
                 var y = sat_pos[i*3+1];
@@ -102,7 +98,7 @@ function changeSatelliteColors(value, table) {
             new_content += addColor(range_colors[i], "[" + min + " - " + max + "[ km");
         }
 
-    } else if (value == "type") {
+    } else if (value === "type") {
         colors.copyArray(type_colors);
 
         for (var i = 0; i < typesCache.length; i++) {
@@ -260,7 +256,7 @@ function updateOrbitBuffer(sat_id) {
 };
 
 function displayOrbit(sat_id) {
-
+    // TODO fill up?
 }
 
 var got_extra_data = false;
@@ -343,60 +339,6 @@ function highlightSatellite(sat_id, scene, sizes) {
 function unhighlightSatellites() {
     satellite_nameplate.innerHTML = "";
     satellite_nameplate.style.display = "none";
-}
-
-function flipInfo(sat_id) {
-    document.getElementById("info-" + sat_id).classList.toggle('full');
-}
-
-function removeInfo(sat_id) {
-    orbit_selection_group.remove(selected_satellites[sat_id]);
-    selected_satellites[sat_id] = null;
-
-    var reme = document.getElementById("info-" + sat_id);
-    reme.parentElement.removeChild(reme); 
-
-}
-
-function selectSatellite(satellite_info_box) {
-    if (intersected_satellite == null) return;
-    if (selected_satellites[intersected_satellite] != null) return;
-
-    selected_satellite = intersected_satellite;
-
-    var selection_line = orbit_line.clone();
-    selection_line.material = selected_orbit_material;
-    selected_satellites[selected_satellite] = selection_line;
-    orbit_selection_group.add(selection_line);
-
-    var extra = sat_extra[selected_satellite]
-
-    var sat_info = "<div id='info-" + selected_satellite + "' class='satellite-info";
-    if (satellite_info_box.children.length == 0) {
-        sat_info += " full";
-    }
-    sat_info += "'>";
-    sat_info += "<h1>" + sat_data[selected_satellite].name + "</h1>";
-    sat_info += "<div class='info-buttons'>";
-    sat_info += "<button class='flip-button' onclick='flipInfo(" + selected_satellite + ")'></button>";
-    sat_info += "<button class='remove-button' onclick='removeInfo(" + selected_satellite + ")'></button>";
-    sat_info += "</div><table>";
-    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-    sat_info += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
-    sat_info += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
-    sat_info += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
-    sat_info += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
-    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-    sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-
-    sat_info += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
-    sat_info += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";
-    sat_info += "<tr><td>Apogee</td><td>" + extra.apogee + "</td></tr>";
-    sat_info += "<tr><td>Perigee</td><td>" + extra.perigee + "</td></tr>";
-    sat_info += "<tr><td>Period</td><td>" + extra.period + "</td></tr>";
-    sat_info += "</table></div>";
-
-    satellite_info_box.innerHTML += sat_info;
 }
 
 function intersectSatellites(raycaster, scene, container) {
