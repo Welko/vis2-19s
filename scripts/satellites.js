@@ -84,8 +84,10 @@ function changeSatelliteColors(value, table) {
                 var z = sat_pos[i*3+2];
                 range.push(Math.sqrt(x*x + y*y + z*z));
             }
-        } else {
-            //range = sat_alt; // sat_alt changed to sat_geo TODO reimplement
+        } else { //if (value === "altitude") {
+            for (var i = 0; i < sat_geo.length; i++) {
+                range.push(sat_geo[i*3+2]); // Altitude
+            }
         }
 
         for(var i = 0; i < range.length; i++) {

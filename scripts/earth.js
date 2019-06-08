@@ -102,9 +102,5 @@ function findSatellitesInCone() {
 
 function setSelectionConeFunctionToAdd(add) {
     if (selection_cone == null) return;
-    if (add) {
-        selection_cone.material.color = _SELECTION_CONE_COLOR_ADD;
-    } else {
-        selection_cone.material.color = _SELECTION_CONE_COLOR_REM;
-    }
+    selection_cone.material.color = add ? _SELECTION_CONE_COLOR_ADD : _SELECTION_CONE_COLOR_REM;
 }
