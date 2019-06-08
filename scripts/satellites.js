@@ -56,7 +56,7 @@ function addColor(color, descr) {
 
 function changeSatelliteColors(value, table) {
     if (!finished_loading) return;
-    
+
     table.innerHTML = "";
     var new_content = "";
     var colors = sat_points.geometry.attributes.color;
@@ -69,7 +69,12 @@ function changeSatelliteColors(value, table) {
         new THREE.Color(0xbd0026)
     ];
 
-    if (value === "altitude" || value === "distance") { // DOES NOT UPDATE continuously!
+    if (value === "selection") {
+        colorAllSatellitesBasedOnSelection();
+        new_content += addColor(_SAT_COLOR_SELECTED, "Selected");
+        new_content += addColor(_SAT_COLOR_NOT_SELECTED, "Not selected");
+
+    } else if (value === "altitude" || value === "distance") { // DOES NOT UPDATE continuously!
 
         var range = [];
         if (value === "distance") {

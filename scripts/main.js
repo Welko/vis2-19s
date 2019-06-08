@@ -15,17 +15,26 @@ var mouse, mouse_screen, raycaster;
 var clock = new THREE.Clock();
 
 // Flags
+let f_shift_down = false;
 let f_ctrl_down = false;
-let f_ctrl_drag = false;
+let f_drag = false;
+
+// UI stuff
+var UI_SATELLITES_COUNT;
 
 function init() {
 
   container = document.getElementById('canvas');
   satellite_nameplate = document.getElementById('satellite-nameplate');
   satellite_info_box = document.getElementById('satellite-info-box');
+  UI_SATELLITES_COUNT = document.getElementById('satellites-count');
   var color_info = document.getElementById('color-info');
+
   var color_select = document.getElementById('color-select');
   color_select.addEventListener('change', function() { changeSatelliteColors(color_select.value, color_info); }, false);
+
+  var button_clear_selection = document.getElementById("button-clear-selection");
+  button_clear_selection.addEventListener("click", function() {clearSatelliteSelection();});
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
@@ -69,7 +78,13 @@ function onWindowResize(event) {
 
 function onKeyDown(event) {
     switch(event.keyCode) {
-        case 17: // CTRL (sketch on earth)
+        case 16: // SHIFT (add satellites to selection)
+            setSelectionConeFunctionToAdd(true);
+            f_shift_down = true;
+            break;
+
+        case 17: // CTRL (remove satellites from selection)
+            setSelectionConeFunctionToAdd(false);
             f_ctrl_down = true;
             break;
 
@@ -81,18 +96,22 @@ function onKeyDown(event) {
 
 function onKeyUp(event) {
   switch (event.keyCode) {
-      case 17: // CTRL (sketch on earth)
+      case 16: // SHIFT (add satellites to selection)
+          f_shift_down = false;
+          break;
+
+      case 17: // CTRL (remove satellites from selection)
           f_ctrl_down = false;
           break;
   }
 }
 
 function onMouseDown(event) {
+  f_drag = true;
   switch (event.button) {
       case 0: // Left mouse button
-          if (f_ctrl_down) {
-            cameraControls.enabled = false;
-            f_ctrl_drag = true;
+          if (f_shift_down || f_ctrl_down) {
+              cameraControls.enabled = false;
           } else if (intersected_satellite !== null) {
             selectSatellite(intersected_satellite);
           }
@@ -100,8 +119,9 @@ function onMouseDown(event) {
 }
 
 function onMouseUp(event) {
-    f_ctrl_drag = false;
+    f_drag = false;
     cameraControls.enabled = true;
+    removeCone();
 }
 
 function onMouseMove(event) {
@@ -128,17 +148,21 @@ function render() {
 
   let plsIntersect = true; // Please intersect!
 
-  if (plsIntersect && f_ctrl_drag && earth != null) {
+  if (plsIntersect && (f_shift_down || f_ctrl_down) && f_drag && earth != null) {
     var intersection = intersectEarth(raycaster);
     if (intersection !== null) {
         positionCone(intersection.point);
         var sat_indexes_in_cone = findSatellitesInCone();
-        addSelectedSatellites(sat_indexes_in_cone);
+        if (f_shift_down) {
+            addSelectedSatellites(sat_indexes_in_cone);
+        } else { //if (f_ctrl_down) {
+            removeSelectedSatellites(sat_indexes_in_cone);
+        }
         plsIntersect = false;
     }
   }
 
-  if (plsIntersect && !f_ctrl_drag && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
+  if (plsIntersect && !f_ctrl_down && !f_shift_down && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
     plsIntersect = ! intersectSatellites(raycaster, scene, container);
   }
 

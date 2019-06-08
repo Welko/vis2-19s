@@ -1,10 +1,11 @@
+var _SAT_IDS_SELECTED_COUNT = 0;
 var _SAT_IDS_SELECTED = [];
 
-var _SAT_COLOR_SELECTED = new THREE.Color(0xff000);
+var _SAT_COLOR_SELECTED = new THREE.Color(0xffffff);
 var _SAT_COLOR_NOT_SELECTED = new THREE.Color(0x444444);
 
 function initializeSatelliteSelectorIfNotInitialized() {
-    if (sat_points == null) return;
+    if (sat_pos == null) return;
 
     // Set up selected satellites array. Make all 'false'
     // This assumes that the number of satellites never changes (only on initialization)
@@ -20,6 +21,7 @@ function getSatelliteColorBasedOnSelection(selected) {
     return selected ? _SAT_COLOR_SELECTED : _SAT_COLOR_NOT_SELECTED;
 }
 
+// Returns the number of satellites that changed state
 function setSelectedSatellites(sat_indexes, value) {
     initializeSatelliteSelectorIfNotInitialized();
 
@@ -28,25 +30,72 @@ function setSelectedSatellites(sat_indexes, value) {
     var colorsObj = sat_points.geometry.attributes.color;
     var colors = colorsObj.array;
 
+    var count = 0;
+
     for (var i = 0; i < sat_indexes.length; i++) {
         var index = sat_indexes[i];
-        _SAT_IDS_SELECTED[index] = value;
+        var old = _SAT_IDS_SELECTED[index];
 
-        var c = getSatelliteColorBasedOnSelection(value);
-        colors[index*3]   = c.r;
-        colors[index*3+1] = c.g;
-        colors[index*3+2] = c.b;
+        if (old !==  value) {
+            _SAT_IDS_SELECTED[index] = value;
+            count++;
+
+            var c = getSatelliteColorBasedOnSelection(value);
+            colors[index*3]   = c.r;
+            colors[index*3+1] = c.g;
+            colors[index*3+2] = c.b;
+        }
+    }
+
+    colorsObj.needsUpdate = true;
+
+    return count;
+}
+
+function addSelectedSatellites(sat_indexes) {
+    var changedCount = setSelectedSatellites(sat_indexes, true);
+    _SAT_IDS_SELECTED_COUNT += changedCount;
+    updateSatellitesCount()
+}
+
+function removeSelectedSatellites(sat_indexes) {
+    var changedCount = setSelectedSatellites(sat_indexes, false);
+    _SAT_IDS_SELECTED_COUNT -= changedCount;
+    updateSatellitesCount();
+}
+
+function clearSatelliteSelection() {
+    initializeSatelliteSelectorIfNotInitialized();
+    var colorsObj = sat_points.geometry.attributes.color;
+    var colors = colorsObj.array;
+    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
+        _SAT_IDS_SELECTED[i] = false;
+        colors[i*3]   = _SAT_COLOR_NOT_SELECTED.r;
+        colors[i*3+1] = _SAT_COLOR_NOT_SELECTED.g;
+        colors[i*3+2] = _SAT_COLOR_NOT_SELECTED.b;
+    }
+    colorsObj.needsUpdate = true;
+    _SAT_IDS_SELECTED_COUNT = 0;
+    updateSatellitesCount();
+}
+
+function colorAllSatellitesBasedOnSelection() {
+    initializeSatelliteSelectorIfNotInitialized();
+
+    var colorsObj = sat_points.geometry.attributes.color;
+    var colors = colorsObj.array;
+    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
+        var c = _SAT_IDS_SELECTED[i] ? _SAT_COLOR_SELECTED : _SAT_COLOR_NOT_SELECTED;
+        colors[i*3]   = c.r;
+        colors[i*3+1] = c.g;
+        colors[i*3+2] = c.b;
     }
 
     colorsObj.needsUpdate = true;
 }
 
-function addSelectedSatellites(sat_indexes) {
-    setSelectedSatellites(sat_indexes, true);
-}
-
-function removeSelectedSatellites(sat_indexes) {
-    setSelectedSatellites(sat_indexes, false);
+function updateSatellitesCount() {
+    UI_SATELLITES_COUNT.innerHTML = _SAT_IDS_SELECTED_COUNT;
 }
 
 // Input: a1: a sorted array with no repeating elements

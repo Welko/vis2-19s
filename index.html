@@ -18,11 +18,19 @@
         <option value="type" selected>Type</option>
         <option value="altitude">Altitude</option>
         <option value="distance">Distance</option>
+        <option value="selection">Selection</option> <!-- Debug! TODO: remove -->
       </select>
       <table id="color-info">
       </table>
     </div>
     <div id="satellite-info-box"></div>
+  </div>
+  <div id="overlay-left">
+    Selection
+    <button id="button-clear-selection">Clear</button>
+    <table id="selection-table">
+      <tr><td>Count</td><td id="satellites-count">0</td></tr>
+    </table>
   </div>
   <!-- <div id="overlay-bottom">
     <div id="timeline">

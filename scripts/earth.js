@@ -6,6 +6,9 @@ var cone_lookAt_point_normalized = null;
 var selection_cone;
 var satellites_in_cone;
 
+var _SELECTION_CONE_COLOR_ADD = new THREE.Color(0x44ff44);
+var _SELECTION_CONE_COLOR_REM = new THREE.Color(0xff4444);
+
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
     earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
@@ -70,6 +73,10 @@ function positionCone(p) {
     scene.add(selection_cone);
 }
 
+function removeCone() {
+    scene.remove(selection_cone);
+}
+
 // Returns a sorted list with the indexes of all satellites that are inside the cone
 function findSatellitesInCone() {
     if (cone_angle <= 0 || cone_lookAt_point_normalized == null) return [];
@@ -91,4 +98,13 @@ function findSatellitesInCone() {
     }
 
     return sat_indexes;
+}
+
+function setSelectionConeFunctionToAdd(add) {
+    if (selection_cone == null) return;
+    if (add) {
+        selection_cone.material.color = _SELECTION_CONE_COLOR_ADD;
+    } else {
+        selection_cone.material.color = _SELECTION_CONE_COLOR_REM;
+    }
 }
