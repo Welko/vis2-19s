@@ -92,9 +92,9 @@ function onMouseDown(event) {
       case 0: // Left mouse button
           if (f_ctrl_down) {
             cameraControls.enabled = false;
-              f_ctrl_drag = true;
-          } else {
-            selectSatellite(satellite_info_box);
+            f_ctrl_drag = true;
+          } else if (intersected_satellite !== null) {
+            selectSatellite(intersected_satellite);
           }
   }
 }
@@ -118,6 +118,7 @@ function animate() {
 }
 
 function render() {
+  //updateTime();
   let delta = clock.getDelta();
 
   cameraControls.update(delta);
@@ -128,10 +129,16 @@ function render() {
   let plsIntersect = true; // Please intersect!
 
   if (plsIntersect && f_ctrl_drag && earth != null) {
-    plsIntersect = ! intersectEarth(raycaster);
+    var intersection = intersectEarth(raycaster);
+    if (intersection !== null) {
+        positionCone(intersection.point);
+        var sat_indexes_in_cone = findSatellitesInCone();
+        addSelectedSatellites(sat_indexes_in_cone);
+        plsIntersect = false;
+    }
   }
 
-  if (plsIntersect && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
+  if (plsIntersect && !f_ctrl_drag && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
     plsIntersect = ! intersectSatellites(raycaster, scene, container);
   }
 

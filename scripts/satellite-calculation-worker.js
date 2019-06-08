@@ -3,7 +3,7 @@
 importScripts('../libs/satellite.js');
 
 var tle_cache = [];
-var sat_pos, sat_vel, sat_alt;
+var sat_pos, sat_vel, sat_geo;
 
 onmessage = function(m) {
   var start = Date.now();
@@ -39,7 +39,7 @@ onmessage = function(m) {
   
   sat_pos = new Float32Array(len * 3);
   sat_vel = new Float32Array(len * 3);
-  sat_alt = new Float32Array(len);
+    sat_geo = new Float32Array(len * 3);
   
   var postStart = Date.now();
   postMessage({
@@ -99,14 +99,16 @@ function propagate() {
     sat_vel[i*3] = vx;
     sat_vel[i*3+1] = vy;
     sat_vel[i*3+2] = vz;
-    
-    sat_alt[i] = alt;
+
+    sat_geo[i*3] = lat;
+    sat_geo[i*3+1] = lon;
+    sat_geo[i*3+2] = alt;
   }
  
-  postMessage({sat_pos: sat_pos.buffer, sat_vel: sat_vel.buffer, sat_alt: sat_alt.buffer}, [sat_pos.buffer, sat_vel.buffer, sat_alt.buffer]);
+  postMessage({sat_pos: sat_pos.buffer, sat_vel: sat_vel.buffer, sat_geo: sat_geo.buffer}, [sat_pos.buffer, sat_vel.buffer, sat_geo.buffer]);
   sat_pos = new Float32Array(tle_cache.length * 3);
   sat_vel = new Float32Array(tle_cache.length * 3);
-  sat_alt = new Float32Array(tle_cache.length);
+  sat_geo = new Float32Array(tle_cache.length);
   
   setTimeout(propagate, 500);
 }

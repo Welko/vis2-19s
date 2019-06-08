@@ -4,11 +4,10 @@ var selected_satellites_uis = [];
 var selected_satellites_ids = [];
 
 // Satellite added to list and its extra information
-function selectSatellite(satellite_info_box) {
-    if (intersected_satellite == null) return;
-    if (selected_satellites_ids.includes(intersected_satellite)) return;
+function addSatelliteToList(sat_id) {
+    if (selected_satellites_ids.includes(sat_id)) return;
 
-    selected_satellite_id = intersected_satellite;
+    selected_satellite_id = sat_id;
 
     var selection_line = orbit_line.clone();
     selection_line.material = selected_orbit_material;
@@ -88,11 +87,12 @@ function updateSatelliteUi(index) {
     var lat = document.getElementById("lat-" + id);
     var lon = document.getElementById("lon-" + id);
     var alt = document.getElementById("alt-" + id);
-    var coords = getSatelliteCoords(id, new Date());
 
-    lat.innerHTML = coords.lat;
-    lon.innerHTML = coords.lon;
-    alt.innerHTML = coords.alt;
+    var a = sat_geo[index*3];
+    var b = sat_geo[index*3 + 1];
+    var c = sat_geo[index*3 + 2];
 
-    console.log("Updated with index " + index + ": lat=" + coords.lat + " lon=" + coords.lon + " alt=" + coords.alt);
+    lat.innerHTML = sat_geo[index*3];
+    lon.innerHTML = sat_geo[index*3 + 1];
+    alt.innerHTML = sat_geo[index*3 + 2];
 }

@@ -2,20 +2,20 @@ var SATELLITE_SIZE = 2;
 var ORBIT_SEGMENTS = 255;
 var KM_TO_WORLD_UNITS = 0.001;
 
+// Real data!
 var tle_json;
 var sat_data;
 var sat_extra;
-var sat_pos;
-var sat_vel;
-var sat_alt;
-
-var sat_coords;
+var sat_pos; // Updated continuously
+var sat_vel; // Updated continuously
+var sat_geo; // Updated continuously
 
 var satelliteWorker = new Worker('./scripts/satellite-calculation-worker.js');
 var orbitWorker = new Worker('./scripts/orbit-calculation-worker.js');
 
 var time_index = 0;
 
+// Geometry stuff (three.js)
 var sat_points = [];
 var sat_orbit_arrays = [];
 var in_progress = [];
@@ -73,14 +73,14 @@ function changeSatelliteColors(value, table) {
 
         var range = [];
         if (value === "distance") {
-            for (var i = 0; i < sat_alt.length; i++) {
+            for (var i = 0; i < sat_pos.length; i++) {
                 var x = sat_pos[i*3];
                 var y = sat_pos[i*3+1];
                 var z = sat_pos[i*3+2];
                 range.push(Math.sqrt(x*x + y*y + z*z));
             }
         } else {
-            range = sat_alt;
+            //range = sat_alt; // sat_alt changed to sat_geo TODO reimplement
         }
 
         for(var i = 0; i < range.length; i++) {
@@ -129,7 +129,6 @@ function getSatellites(scene, tle_text) {
             tleLine1: tle_json[i].TLE_LINE1,
             tleLine2: tle_json[i].TLE_LINE2
         });
-        sat_coords.push(getSatelliteCoords(i, now));
     }
 
     satellite_transform = new THREE.Matrix4().compose(
@@ -277,7 +276,7 @@ satelliteWorker.onmessage = function(m) {
 
     sat_pos = new Float32Array(m.data.sat_pos);
     sat_vel = new Float32Array(m.data.sat_vel);
-    sat_alt = new Float32Array(m.data.sat_alt);
+    sat_geo = new Float32Array(m.data.sat_geo);
 
     if (!finished_loading) {
 
@@ -292,6 +291,8 @@ satelliteWorker.onmessage = function(m) {
     var position = sat_points.geometry.attributes.position;
     position.copyArray(sat_pos);
     position.needsUpdate = true;
+
+    updateSatellitesUi();
 };
 
 orbitWorker.onmessage = function(m) {
@@ -359,12 +360,12 @@ function intersectSatellites(raycaster, scene, container) {
     var attributes = geometry.attributes;
     var intersects = raycaster.intersectObject(sat_points);
 
-    if (intersects.length > 0) {
+    if (intersects.length > 0) { // If there is an intersection
 
         container.style.cursor = "pointer"; 
 
         // selected new satellite
-        if (intersected_satellite !== intersects[0].index) {
+        if (intersected_satellite !== intersects[0].index) { // New satellite is different than previous one
 
              // reset old satellite
             resetSatellite(intersected_satellite, scene, attributes.size);
@@ -375,7 +376,7 @@ function intersectSatellites(raycaster, scene, container) {
         }
         return true;
 
-    } else if (intersected_satellite !== null) {
+    } else if (intersected_satellite !== null) { // No intersection AND no previous intersection
 
         container.style.cursor = "auto"; 
 
@@ -388,45 +389,6 @@ function intersectSatellites(raycaster, scene, container) {
     return false;
 }
 
-function getSatelliteCoordsFromParams(x, y, z, velx, vely, velz, lon, lat, alt) {
-    return {
-        x: x,
-        y: y,
-        z: z,
-
-        velx: velx,
-        vely: vely,
-        velz: velz,
-
-        lon: lat,
-        lat: lon,
-        alt: alt
-    };
-}
-
-function getSatelliteCoords(sat_id, when) {
-    var gmst = satellite.gstime(when);
-    var sat = sat_data[sat_id];
-    var rec = satellite.twoline2satrec(sat.tleLine1, sat.tleLine2);
-
-    var eci = satellite.propagate(rec, when);
-    try {
-        var geo = satellite.eciToGeodetic(eci.position, gmst);
-        return getSatelliteCoordsFromParams(
-            eci.position.x,
-            eci.position.y,
-            eci.position.z,
-
-            eci.velocity.x,
-            eci.velocity.y,
-            eci.velocity.z,
-
-            geo.longitude,
-            geo.latitude,
-            geo.height
-        );
-
-    } catch (e) {
-        return getSatelliteCoordsFromParams(0, 0, 0, 0, 0, 0, 0, 0, 0);
-    }
+function selectSatellite(sat_id) {
+    addSatelliteToList(sat_id);
 }

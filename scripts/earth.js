@@ -1,6 +1,10 @@
-earth = null;
+var earth = null;
+
+var cone_angle = 0;
+var cone_lookAt_point_normalized = null;
 
 var selection_cone;
+var satellites_in_cone;
 
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
@@ -24,7 +28,13 @@ function generateSelectionCone() {
     var h = 10000000;
     var r_ratio = 0.1; // find correct value!
     var r = h * r_ratio;
+
+    cone_angle = Math.atan(r / h);
+    console.log("Cone angle in rad: " + cone_angle);
+
+    // radius, height, radial_segments, heightSegments, openEnded
     var geometry = new THREE.ConeBufferGeometry(r, h, 128, 1, true);
+
     var material = new THREE.MeshBasicMaterial( {
         color: 0xffff00,
         opacity: 0.2,
@@ -32,8 +42,8 @@ function generateSelectionCone() {
         side: THREE.DoubleSide
     } );
 
-    geometry.translate(0, h * -0.5, 0); 
-    geometry.rotateX(Math.PI*.5);
+    geometry.translate(0, h * -0.5, 0);
+    geometry.rotateX(-Math.PI / 2);
 
     selection_cone = new THREE.Mesh(geometry, material);
 }
@@ -46,39 +56,39 @@ function intersectEarth(raycaster) {
     let intersects = raycaster.intersectObject(earth);
 
     if (intersects.length > 0) {
-        console.log("Intersected!");
-
-        var rot = new Matrix4().lookAt(new THREE.Vector3(), intersects[0].point, new THREE.Vector3(0, 1, 0));
-        selection_cone.setRotationFromMatrix(rot);
-
-        scene.add(selection_cone);
+        return intersects[0];
     } else {
-        scene.remove(selection_cone);
+        return null;
+    }
+}
+
+function positionCone(p) {
+    cone_lookAt_point_normalized = p;
+    cone_lookAt_point_normalized.normalize();
+
+    selection_cone.lookAt(p);
+    scene.add(selection_cone);
+}
+
+// Returns a sorted list with the indexes of all satellites that are inside the cone
+function findSatellitesInCone() {
+    if (cone_angle <= 0 || cone_lookAt_point_normalized == null) return [];
+
+    var sat_indexes = [];
+    for (var i = 0; i < sat_pos.length; i++) {
+        var p = new THREE.Vector3(sat_pos[i*3], sat_pos[i*3+1], sat_pos[i*3+2]);
+        p.normalize();
+
+        var c = cone_lookAt_point_normalized;
+        //var c = cone_lookAt_point.clone();
+        //c.normalize();
+
+        var angle = Math.acos(p.dot(c));
+
+        if (angle < cone_angle) {
+            sat_indexes.push(i);
+        }
     }
 
-    /*if (intersects.length > 0) {
-
-        // selected new satellite
-        if (INTERSECTED !== intersects[0].index) {
-
-            // reset old satellite
-            attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
-
-            // change new satellite
-            INTERSECTED = intersects[0].index;
-            attributes.size.array[INTERSECTED] = PARTICLE_SIZE * 1.5;
-            attributes.size.needsUpdate = true;
-
-            satellite_nameplate.innerHTML = _sats[INTERSECTED].name;
-            satellite_nameplate.style.left = mouse_screen.x + "px";
-            satellite_nameplate.style.top = mouse_screen.y + "px";
-        }
-    } else if (INTERSECTED !== null) {
-        attributes.size.array[INTERSECTED] = PARTICLE_SIZE;
-        attributes.size.needsUpdate = true;
-        INTERSECTED = null;
-        satellite_nameplate.innerHTML = "";
-    }*/
-
-    return intersects.length > 0;
+    return sat_indexes;
 }
