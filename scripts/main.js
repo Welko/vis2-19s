@@ -20,18 +20,20 @@ let f_ctrl_down = false;
 let f_drag = false;
 
 // UI stuff
-var UI_SATELLITES_COUNT;
+var _ui_satellites_count;
+var _ui_color_select;
+var _ui_color_info_table;
 
 function init() {
 
   container = document.getElementById('canvas');
   satellite_nameplate = document.getElementById('satellite-nameplate');
   satellite_info_box = document.getElementById('satellite-info-box');
-  UI_SATELLITES_COUNT = document.getElementById('satellites-count');
-  var color_info = document.getElementById('color-info');
+  _ui_satellites_count = document.getElementById('satellites-count');
+    _ui_color_info_table = document.getElementById('color-info-table');
 
-  var color_select = document.getElementById('color-select');
-  color_select.addEventListener('change', function() { changeSatelliteColors(color_select.value, color_info); }, false);
+  _ui_color_select = document.getElementById('color-select');
+  _ui_color_select.addEventListener('change', function() { updateSatellitesColor(); }, false);
 
   var button_clear_selection = document.getElementById("button-clear-selection");
   button_clear_selection.addEventListener("click", function() {clearSatelliteSelection();});

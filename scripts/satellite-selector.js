@@ -79,23 +79,8 @@ function clearSatelliteSelection() {
     updateSatellitesCount();
 }
 
-function colorAllSatellitesBasedOnSelection() {
-    initializeSatelliteSelectorIfNotInitialized();
-
-    var colorsObj = sat_points.geometry.attributes.color;
-    var colors = colorsObj.array;
-    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
-        var c = _SAT_IDS_SELECTED[i] ? _SAT_COLOR_SELECTED : _SAT_COLOR_NOT_SELECTED;
-        colors[i*3]   = c.r;
-        colors[i*3+1] = c.g;
-        colors[i*3+2] = c.b;
-    }
-
-    colorsObj.needsUpdate = true;
-}
-
 function updateSatellitesCount() {
-    UI_SATELLITES_COUNT.innerHTML = _SAT_IDS_SELECTED_COUNT;
+    _ui_satellites_count.innerHTML = _SAT_IDS_SELECTED_COUNT;
 }
 
 // Input: a1: a sorted array with no repeating elements
