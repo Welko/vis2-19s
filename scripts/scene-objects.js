@@ -2,6 +2,9 @@ var SPACE_ORBIT_SEGMENTS = 1024;
 
 var sample_orbit;
 var bodies = [];
+var equatorial_to_ecliptic; 
+
+var sun_light;
 
 function createSceneBody(radius, height, color) {
     var body_geometry = new THREE.SphereGeometry(1, 48, 24);
@@ -43,6 +46,9 @@ function fillSceneWithObjects(scene) {
     polar_grid.material.transparent = true,
     scene.add(polar_grid);
 
+    sun_light = new THREE.DirectionalLight(0xffffff, 0.5);
+    scene.add(sun_light);
+
     var geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(SPACE_ORBIT_SEGMENTS*3), 3));
     var material = new THREE.LineBasicMaterial({
@@ -51,6 +57,16 @@ function fillSceneWithObjects(scene) {
         transparent: true,
     });
     sample_orbit = new THREE.Line(geometry, material);
+
+    var obliquity = 23.43676 / 180 * Math.PI;
+    var cos_o = Math.cos(obliquity);
+    var sin_o = Math.sin(obliquity);
+    equatorial_to_ecliptic = new THREE.Matrix3();
+    equatorial_to_ecliptic.set(
+        1, 0, 0,
+        0, cos_o, sin_o,
+        0, -sin_o, cos_o
+    );
 
     // earth
     fillSceneWithEarth(scene);
@@ -103,11 +119,14 @@ function addBodyOrbit(scene, body, color) {
 
     for (var i = 0; i < SPACE_ORBIT_SEGMENTS; i++) {
         var segment = (i / SPACE_ORBIT_SEGMENTS) * period;
-        var coordinates = body.GeocentricCoordinates(day + segment); //https://en.wikipedia.org/wiki/Astronomical_unit
-    
-        positions[i*3] = coordinates.x * AU_TO_WORLD_UNITS;
-        positions[i*3+1] = coordinates.z * AU_TO_WORLD_UNITS; // y and z flipped
-        positions[i*3+2] = coordinates.y * AU_TO_WORLD_UNITS;
+        var c = body.GeocentricCoordinates(day + segment); //https://en.wikipedia.org/wiki/Astronomical_unit
+        var coordinates = new THREE.Vector3(c.x, c.y, c.z);
+        coordinates.multiplyScalar(AU_TO_WORLD_UNITS);
+        coordinates = EquatorialToEclipticPlane(coordinates);
+
+        positions[i*3] = coordinates.x;
+        positions[i*3+1] = coordinates.z; // y and z flipped
+        positions[i*3+2] = coordinates.y;
 
         if (isNaN(positions[i*3]) || isNaN(positions[i*3+1]) || isNaN(positions[i*3+2])) {
             console.log(i, day, positions[i*3], positions[i*3+1], positions[i*3+2], coordinates.x, coordinates.z, coordinates.y);
@@ -120,18 +139,31 @@ function addBodyOrbit(scene, body, color) {
     scene.add(orbit);
 }
 
+function EquatorialToEclipticPlane(coordinates) {
+    return coordinates.applyMatrix3(equatorial_to_ecliptic); 
+}
+
 function astronomyCalculation() {
     
     var day = Astronomy.DayValue(new Date());
 
     for (var i = 0; i < bodies.length; i++) {
         var body = bodies[i].astronomy_body;
-        var coordinates = body.GeocentricCoordinates(day); //https://en.wikipedia.org/wiki/Astronomical_unit
-    
+        var c = body.GeocentricCoordinates(day); //https://en.wikipedia.org/wiki/Astronomical_unit
+        var coordinates = new THREE.Vector3(c.x, c.y, c.z);
+        coordinates.multiplyScalar(AU_TO_WORLD_UNITS);
+        coordinates = EquatorialToEclipticPlane(coordinates);
+
         var scene_object_pos = bodies[i].scene_object.position;
-        scene_object_pos.x = coordinates.x * AU_TO_WORLD_UNITS;
-        scene_object_pos.y = coordinates.z * AU_TO_WORLD_UNITS; // ATTENTION FLIP
-        scene_object_pos.z = coordinates.y * AU_TO_WORLD_UNITS;
+        scene_object_pos.x = coordinates.x;
+        scene_object_pos.y = coordinates.z; // ATTENTION FLIP
+        scene_object_pos.z = coordinates.y;
+
+        if (body.Name == "Sun") {
+            sun_light.position.x = scene_object_pos.x;
+            sun_light.position.y = scene_object_pos.y;
+            sun_light.position.z = scene_object_pos.z;
+        }
     }
 
     setTimeout(astronomyCalculation, 1000);

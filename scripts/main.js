@@ -182,9 +182,7 @@ function fillScene() {
   scene.add(camera);
 
   // lights
-  scene.add(new THREE.AmbientLight(0x222222));
-  let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-  scene.add(directionalLight);
+  scene.add(new THREE.AmbientLight(0x000000));
 
   fillSceneWithObjects(scene);
 
