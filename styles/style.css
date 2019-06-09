@@ -66,6 +66,10 @@ table {
   border-spacing: 5px;
 }
 
+th { /* Table header */
+  border-bottom: 2px solid gray;
+}
+
 .satellite-info {
   background-color: #575555b0;
   padding: 0.5em;
@@ -118,6 +122,18 @@ table {
 
 .remove-button::before {
   content: "×";
+}
+
+.panel {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+
+.overlay-panel {
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 #overlay-right {

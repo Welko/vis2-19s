@@ -58,7 +58,6 @@ function getSatellites(scene, tle_text) {
     var sat_count = tle_json.length;
 
     sat_data = [];
-    sat_coords = [];
     var now = new Date();
     for (var i = 0; i < sat_count; i++) {
         sat_data.push({
@@ -216,6 +215,9 @@ satelliteWorker.onmessage = function(m) {
     if (!finished_loading) {
 
         finished_loading = true;
+
+        initializeSatelliteSelectorIfNotInitialized();
+        initializeSearcher();
 
         sat_points.applyMatrix(satellite_transform);
         scene.add(sat_points); 

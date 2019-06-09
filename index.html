@@ -8,11 +8,11 @@
 </head>
 <body>
 <div id="overlay">
-  <div id="overlay-top">
+  <div id="overlay-top" class="overlay-panel">
     <div id="branding">Satellite Tracker by Lucas and Dominik</div>
   </div>
-  <div id="overlay-right">
-    <div id="selection-box">
+  <div id="overlay-right" class="overlay-panel">
+    <div id="selection-box" class="panel">
       Colors
       <select id="color-select">
         <option value="type" selected>Type</option>
@@ -24,7 +24,7 @@
     </div>
     <div id="satellite-info-box"></div>
   </div>
-  <div id="overlay-left">
+  <div id="overlay-left" class="overlay-panel">
     <div class="panel">
       Selection
       <button id="button-clear-selection">Clear</button>
@@ -35,9 +35,10 @@
     <div class="panel">
       Search
       <input id="search" type="text"/>
+      <table id="search-table"></table>
     </div>
   </div>
-  <!-- <div id="overlay-bottom">
+  <!-- <div id="overlay-bottom" class="overlay-panel">
     <div id="timeline">
       <input type="range" min="0" max="1000" value="0" class="slider" id="timeinput"/>
     </div>
@@ -70,7 +71,7 @@
 <script src="scripts/satellites.js"></script>
 <script src="scripts/satellites-ui.js"></script>
 <script src="scripts/scene-objects.js"></script>
-<script src="scripts/search.js"></script>
+<script src="scripts/searcher.js"></script>
 <script src="scripts/main.js"></script>
 
 </body>

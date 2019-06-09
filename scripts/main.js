@@ -25,6 +25,7 @@ var _ui_satellites_count;
 var _ui_color_select;
 var _ui_color_info_table;
 var _ui_search;
+var _ui_search_table;
 
 function init() {
 
@@ -46,6 +47,8 @@ function init() {
 
     _ui_search = document.getElementById("search");
     _ui_search.addEventListener("input", onSearchTextChanged);
+
+    _ui_search_table = document.getElementById("search-table");
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
