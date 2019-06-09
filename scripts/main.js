@@ -24,20 +24,28 @@ var _ui_renderer;
 var _ui_satellites_count;
 var _ui_color_select;
 var _ui_color_info_table;
+var _ui_search;
 
 function init() {
 
-  container = document.getElementById('canvas');
-  satellite_nameplate = document.getElementById('satellite-nameplate');
-  satellite_info_box = document.getElementById('satellite-info-box');
-  _ui_satellites_count = document.getElementById('satellites-count');
+    container = document.getElementById('canvas');
+    satellite_nameplate = document.getElementById('satellite-nameplate');
+    satellite_info_box = document.getElementById('satellite-info-box');
+    _ui_satellites_count = document.getElementById('satellites-count');
     _ui_color_info_table = document.getElementById('color-info-table');
 
-  _ui_color_select = document.getElementById('color-select');
-  _ui_color_select.addEventListener('change', function() { updateSatellitesColor(); }, false);
+    _ui_color_select = document.getElementById('color-select');
+    _ui_color_select.addEventListener('change', function () {
+        updateSatellitesColor();
+    }, false);
 
-  var button_clear_selection = document.getElementById("button-clear-selection");
-  button_clear_selection.addEventListener("click", function() {clearSatelliteSelection();});
+    var button_clear_selection = document.getElementById("button-clear-selection");
+    button_clear_selection.addEventListener("click", function () {
+        clearSatelliteSelection();
+    });
+
+    _ui_search = document.getElementById("search");
+    _ui_search.addEventListener("input", onSearchTextChanged);
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
@@ -63,13 +71,12 @@ function init() {
   window.addEventListener('resize', onWindowResize, false);
   document.addEventListener('keyup', onKeyUp, false);
   document.addEventListener('keydown', onKeyDown, false);
-  //_ui_renderer.addEventListener('click', onClick, false);
   _ui_renderer.addEventListener('mousedown', onMouseDown, false);
   _ui_renderer.addEventListener('mouseup', onMouseUp, false);
   _ui_renderer.addEventListener('mousemove', onMouseMove, false);
 
   // controls
-  cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+  cameraControls = new THREE.OrbitControls(camera, _ui_renderer);
   cameraControls.update();
 
   fillScene();
@@ -82,33 +89,30 @@ function onWindowResize(event) {
 }
 
 function onKeyDown(event) {
-    switch(event.keyCode) {
+    switch (event.keyCode) {
         case 16: // SHIFT (add satellites to selection)
             setSelectionConeFunctionToAdd(true);
             f_shift_down = true;
-            break;
+            return true;
 
         case 17: // CTRL (remove satellites from selection)
             setSelectionConeFunctionToAdd(false);
             f_ctrl_down = true;
-            break;
+            return true;
 
-        case 82: // R (quick page reload)
-            location.reload();
-            break;
     }
 }
 
 function onKeyUp(event) {
-  switch (event.keyCode) {
-      case 16: // SHIFT (add satellites to selection)
-          f_shift_down = false;
-          break;
+    switch (event.keyCode) {
+        case 16: // SHIFT (add satellites to selection)
+            f_shift_down = false;
+            return true;
 
-      case 17: // CTRL (remove satellites from selection)
-          f_ctrl_down = false;
-          break;
-  }
+        case 17: // CTRL (remove satellites from selection)
+            f_ctrl_down = false;
+            return true;
+    }
 }
 
 function onMouseDown(event) {
