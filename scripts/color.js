@@ -4,7 +4,7 @@ var _COLOR_MODE_DISTANCE = 2;
 var _COLOR_MODE_SELECTION = 3;
 
 var color_mode = null;
-var transfer_function = null;
+var transfer_function_base = null;
 
 function setColorMode(mode) {
     if (color_mode === mode) return;
@@ -50,11 +50,7 @@ function updateSatellitesColor() {
     var colorsObj = sat_points.geometry.attributes.color;
     var colors = colorsObj.array;
     for (var i = 0; i < sat_data.length; i++) {
-        var color = transfer_function(i);
-        if (color == null) {
-            color = transfer_function(i);
-            console.error("Invalid color: " + color);
-        }
+        var color = transferFunction(i);
         colors[i*3]   = color.r;
         colors[i*3+1] = color.g;
         colors[i*3+2] = color.b;
@@ -84,6 +80,8 @@ var COLORS_RANGE = [
 ];
 
 var COLOR_UNDEFINED = new THREE.Color(0x000000);
+var COLOR_SELECTED = new THREE.Color(0xffffff);
+var COLOR_UNSELECTED = new THREE.Color(0x444444);
 
 function buildStringFromRange(bottom, step, top) {
     var tableInnerHtml = "";
@@ -144,31 +142,39 @@ function initializeColorModeType() {
     }
 
     _ui_color_info_table.innerHTML = tableInnerHtml;
-    transfer_function = transferType;
+    transfer_function_base = transferType;
     updateSatellitesColor();
 }
 
 function initializeColorModeAltitude() {
     _ui_color_info_table.innerHTML = buildStringFromConstantStep(0, 10000);
-    transfer_function = transferAltitude;
+    transfer_function_base = transferAltitude;
     updateSatellitesColor();
 }
 
 function initializeColorModeDistance() {
     _ui_color_info_table.innerHTML = buildStringFromConstantStep(0, 10000);
-    transfer_function = transferDistance;
+    transfer_function_base = transferDistance;
     updateSatellitesColor();
 }
 
 function initializeColorModeSelection() {
     _ui_color_info_table.innerHTML = addColorHtml(_SAT_COLOR_SELECTED, "Selected")
                                    + addColorHtml(_SAT_COLOR_NOT_SELECTED, "Not selected");
-    transfer_function = transferSelection;
+    transfer_function_base = transferSelection;
     updateSatellitesColor();
 }
 
 
 // Transfer functions --------------------------------------------------------------------------------------------------
+
+function transferFunction(sat_id) {
+    if (_SAT_IDS_SELECTED[sat_id]) {
+        return COLOR_SELECTED;
+    } else {
+        return transfer_function_base(sat_id);
+    }
+}
 
 function getIndexFromRange(value, min, range) {
     var index = Math.floor( ((value - min) / range) * COLORS_RANGE.length);
@@ -209,5 +215,5 @@ function transferDistance(sat_id) {
 }
 
 function transferSelection(sat_id) {
-    return _SAT_IDS_SELECTED[sat_id] ? _SAT_COLOR_SELECTED : _SAT_COLOR_NOT_SELECTED;
+    return _SAT_IDS_SELECTED[sat_id] ? COLOR_SELECTED : COLOR_UNSELECTED;
 }

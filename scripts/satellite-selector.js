@@ -1,9 +1,6 @@
 var _SAT_IDS_SELECTED_COUNT = 0;
 var _SAT_IDS_SELECTED = [];
 
-var _SAT_COLOR_SELECTED = new THREE.Color(0xffffff);
-var _SAT_COLOR_NOT_SELECTED = new THREE.Color(0x444444);
-
 function initializeSatelliteSelectorIfNotInitialized() {
     if (sat_pos == null) return;
 
@@ -15,10 +12,6 @@ function initializeSatelliteSelectorIfNotInitialized() {
             _SAT_IDS_SELECTED[i] = false;
         }
     }
-}
-
-function getSatelliteColorBasedOnSelection(selected) {
-    return selected ? _SAT_COLOR_SELECTED : _SAT_COLOR_NOT_SELECTED;
 }
 
 // Returns the number of satellites that changed state
@@ -40,7 +33,7 @@ function setSelectedSatellites(sat_indexes, value) {
             _SAT_IDS_SELECTED[index] = value;
             count++;
 
-            var c = getSatelliteColorBasedOnSelection(value);
+            var c = transferFunction(index);
             colors[index*3]   = c.r;
             colors[index*3+1] = c.g;
             colors[index*3+2] = c.b;
@@ -70,9 +63,10 @@ function clearSatelliteSelection() {
     var colors = colorsObj.array;
     for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
         _SAT_IDS_SELECTED[i] = false;
-        colors[i*3]   = _SAT_COLOR_NOT_SELECTED.r;
-        colors[i*3+1] = _SAT_COLOR_NOT_SELECTED.g;
-        colors[i*3+2] = _SAT_COLOR_NOT_SELECTED.b;
+        var c = transferFunction(i);
+        colors[i*3]   = c.r;
+        colors[i*3+1] = c.g;
+        colors[i*3+2] = c.b;
     }
     colorsObj.needsUpdate = true;
     _SAT_IDS_SELECTED_COUNT = 0;
