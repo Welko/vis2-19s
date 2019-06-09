@@ -20,6 +20,7 @@ let f_ctrl_down = false;
 let f_drag = false;
 
 // UI stuff
+var _ui_renderer;
 var _ui_satellites_count;
 var _ui_color_select;
 var _ui_color_info_table;
@@ -47,7 +48,8 @@ function init() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  container.appendChild(renderer.domElement);
+  _ui_renderer = renderer.domElement;
+  container.appendChild(_ui_renderer);
 
   renderer.gammaInput = true;
   renderer.gammaOutput = true;
@@ -61,9 +63,10 @@ function init() {
   window.addEventListener('resize', onWindowResize, false);
   document.addEventListener('keyup', onKeyUp, false);
   document.addEventListener('keydown', onKeyDown, false);
-  document.addEventListener('mousedown', onMouseDown, false);
-  document.addEventListener('mouseup', onMouseUp, false);
-  document.addEventListener('mousemove', onMouseMove, false);
+  //_ui_renderer.addEventListener('click', onClick, false);
+  _ui_renderer.addEventListener('mousedown', onMouseDown, false);
+  _ui_renderer.addEventListener('mouseup', onMouseUp, false);
+  _ui_renderer.addEventListener('mousemove', onMouseMove, false);
 
   // controls
   cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -151,6 +154,7 @@ function render() {
 
   let plsIntersect = true; // Please intersect!
 
+  // Intersect earth
   if (plsIntersect && (f_shift_down || f_ctrl_down) && f_drag && earth != null) {
     var intersection = intersectEarth(raycaster);
     if (intersection !== null) {
@@ -165,6 +169,7 @@ function render() {
     }
   }
 
+  // Intersect satellites
   if (plsIntersect && !f_ctrl_down && !f_shift_down && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
     plsIntersect = ! intersectSatellites(raycaster, scene, container);
   }
