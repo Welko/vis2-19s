@@ -300,29 +300,24 @@ function intersectSatellites(raycaster, scene, container) {
     var attributes = geometry.attributes;
     var intersects = raycaster.intersectObject(sat_points);
 
-    if (intersects.length > 0) { // If there is an intersection
-
-        container.style.cursor = "pointer"; 
-
-        // selected new satellite
-        if (intersected_satellite !== intersects[0].index) { // New satellite is different than previous one
-
-             // reset old satellite
-            resetSatellite(intersected_satellite, scene, attributes.size);
-
-            // change new satellite
-            intersected_satellite = intersects[0].index;
-            highlightSatellite(intersected_satellite, scene, attributes.size)
+    for (var i = 0; i < intersects.length; i++) {
+        var index = intersects[i].index;
+        if (_SAT_IDS_SELECTED[index]) {
+            if (intersected_satellite !== index) {
+                // This satellite is selected AND it's a different satellite than the one intersected previously
+                resetSatellite(intersected_satellite, scene, attributes.size);
+                intersected_satellite = index;
+                highlightSatellite(intersected_satellite, scene, attributes.size);
+            }
+            container.style.cursor = "pointer";
+            return true;
         }
-        return true;
+    }
 
-    } else if (intersected_satellite !== null) { // No intersection AND no previous intersection
-
-        container.style.cursor = "auto"; 
-
+    if (intersected_satellite !== null) {
+        container.style.cursor = "auto";
         resetSatellite(intersected_satellite, scene, attributes.size);
         unhighlightSatellites();
-
         intersected_satellite = null;
     }
 
