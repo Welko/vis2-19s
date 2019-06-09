@@ -101,7 +101,7 @@ function propagate() {
   postMessage({sat_pos: sat_pos.buffer, sat_vel: sat_vel.buffer, sat_geo: sat_geo.buffer}, [sat_pos.buffer, sat_vel.buffer, sat_geo.buffer]);
   sat_pos = new Float32Array(tle_cache.length * 3);
   sat_vel = new Float32Array(tle_cache.length * 3);
-  sat_geo = new Float32Array(tle_cache.length);
+  sat_geo = new Float32Array(tle_cache.length * 3);
   
   setTimeout(propagate, 500);
 }

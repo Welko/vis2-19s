@@ -52,78 +52,6 @@ function startSatelliteLoading(scene) {
     loadJSON(function(text) { getSatellites(scene, text); }, "./resources/TLE.json");
 }
 
-function addColor(color, descr) {
-    var row = "<tr><td style='width: 5em; background-color: #" + color.getHexString() + ";'></td>";
-    row += "<td>" + descr + "</td></tr>";
-    return row;
-}
-
-function changeSatelliteColors(value, table) {
-    if (!finished_loading) return;
-
-    table.innerHTML = "";
-    var new_content = "";
-    var colors = sat_points.geometry.attributes.color;
-
-    var range_colors = [
-        new THREE.Color(0xffffb2),
-        new THREE.Color(0xfecc5c),
-        new THREE.Color(0xfd8d3c),
-        new THREE.Color(0xf03b20),
-        new THREE.Color(0xbd0026)
-    ];
-
-    if (value === "selection") {
-        colorAllSatellitesBasedOnSelection();
-        new_content += addColor(_SAT_COLOR_SELECTED, "Selected");
-        new_content += addColor(_SAT_COLOR_NOT_SELECTED, "Not selected");
-
-    } else if (value === "altitude" || value === "distance") { // DOES NOT UPDATE continuously!
-
-        var range = [];
-        if (value === "distance") {
-            for (var i = 0; i < sat_pos.length; i++) {
-                var x = sat_pos[i*3];
-                var y = sat_pos[i*3+1];
-                var z = sat_pos[i*3+2];
-                range.push(Math.sqrt(x*x + y*y + z*z));
-            }
-        } else { //if (value === "altitude") {
-            for (var i = 0; i < sat_geo.length; i++) {
-                range.push(sat_geo[i*3+2]); // Altitude
-            }
-        }
-
-        for(var i = 0; i < range.length; i++) {
-            var d = range[i];
-            var r = Math.min(Math.floor(d / 10000), range_colors.length-1);
-            var color = range_colors[r];
-
-            colors.array[i*3] = color.r,
-            colors.array[i*3+1] = color.g;
-            colors.array[i*3+2] = color.b;
-        }
-
-        for (var i = 0; i < range_colors.length; i++) {
-            var min = (i * 10000) + "";
-            var max = (((i+1) * 10000)) + "";
-            if (i == range_colors.length-1) max = "Infinity";
-            new_content += addColor(range_colors[i], "[" + min + " - " + max + "[ km");
-        }
-
-    } else if (value === "type") {
-        colors.copyArray(type_colors);
-
-        for (var i = 0; i < typesCache.length; i++) {
-            new_content += addColor(colorsCache[i], typesCache[i]);
-        }
-    }
-
-    table.innerHTML = new_content;
-
-    colors.needsUpdate = true;
-}
-
 function getSatellites(scene, tle_text) {
     tle_json = JSON.parse(tle_text);
 
@@ -187,46 +115,16 @@ function getSatellites(scene, tle_text) {
     });
 }
 
-var typesCache = [];
-var colorsCache = [];
 function prepareSatellitePoints(sat_data) {
-    
-    let color_satellites_prev = -1;
-
-    //http://colorbrewer2.org/#type=qualitative&scheme=Set1&n=8
-    let color_satellites = [
-        new THREE.Color(0xe41a1c),
-        new THREE.Color(0x377eb8),
-        new THREE.Color(0x4daf4a),
-        new THREE.Color(0x984ea3),
-        new THREE.Color(0xff7f00),
-        new THREE.Color(0xffff33),
-        new THREE.Color(0xa65628),
-        new THREE.Color(0xf781bf)
-    ];
-    function next_color() { return color_satellites[(++color_satellites_prev) % color_satellites.length] };
 
     var sizes = [];
-    var colors = [];
     for (var i = 0; i < sat_data.length; i++) {
         sizes.push(SATELLITE_SIZE);
-
-        let index = typesCache.indexOf(sat_data[i].type);
-        if (index === -1) {
-            typesCache.push(sat_data[i].type);
-            colorsCache.push(next_color());
-            index = typesCache.length - 1;
-        }
-        let c = colorsCache[index];
-        
-        colors.push(c.r, c.g, c.b);
     }
-
-    type_colors = new Float32Array(colors);
 
     let geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
-    geometry.addAttribute('color', new THREE.Float32BufferAttribute(type_colors, 3).setDynamic(true));
+    geometry.addAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
     geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
     //geometry.computeBoundingSphere();
 
@@ -323,7 +221,7 @@ satelliteWorker.onmessage = function(m) {
         sat_points.applyMatrix(satellite_transform);
         scene.add(sat_points); 
 
-        changeSatelliteColors("type", document.getElementById('color-info')); // call once so the text ist written
+        setColorMode(_COLOR_MODE_TYPE);
     }
 
     var position = sat_points.geometry.attributes.position;
