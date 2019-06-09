@@ -124,13 +124,12 @@ function prepareSatellitePoints(sat_data) {
 
     let geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
-    geometry.addAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
+    geometry.addAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*4), 4).setDynamic(true));
     geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
     //geometry.computeBoundingSphere();
 
     let material = new THREE.ShaderMaterial( {
         uniforms: {
-            mainColor: { value: new THREE.Color(0xffffff) },
             texture: { value: new THREE.TextureLoader().load("./resources/circle.png") }
         },
         vertexShader: satellite_vert,

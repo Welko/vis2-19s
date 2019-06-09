@@ -6,8 +6,8 @@ function initializeSatelliteSelectorIfNotInitialized() {
 
     // Set up selected satellites array. Make all 'false'
     // This assumes that the number of satellites never changes (only on initialization)
-    if (sat_pos.length !== _SAT_IDS_SELECTED.length) {
-        _SAT_IDS_SELECTED = new Array(sat_pos.length);
+    if (sat_data.length !== _SAT_IDS_SELECTED.length) {
+        _SAT_IDS_SELECTED = new Array(sat_data.length);
         for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
             _SAT_IDS_SELECTED[i] = false;
         }
@@ -25,18 +25,35 @@ function setSelectedSatellites(sat_indexes, value) {
 
     var count = 0;
 
+    // Debug TODO remove
+    var trues = [];
+    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
+        if (_SAT_IDS_SELECTED[i]) {
+            trues.push(i);
+        }
+    }
+
     for (var i = 0; i < sat_indexes.length; i++) {
         var index = sat_indexes[i];
         var old = _SAT_IDS_SELECTED[index];
 
-        if (old !==  value) {
+        if (old !== value) {
             _SAT_IDS_SELECTED[index] = value;
             count++;
 
-            var c = transferFunction(index);
-            colors[index*3]   = c.r;
-            colors[index*3+1] = c.g;
-            colors[index*3+2] = c.b;
+            var c = colorFunction(index);
+            colors[index*4]   = c.r;
+            colors[index*4+1] = c.g;
+            colors[index*4+2] = c.b;
+            colors[index*4+3] = alphaFunction(index);
+        }
+    }
+
+    // Debug TODO remove
+    var trues = [];
+    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
+        if (_SAT_IDS_SELECTED[i]) {
+            trues.push(i);
         }
     }
 
@@ -63,10 +80,11 @@ function clearSatelliteSelection() {
     var colors = colorsObj.array;
     for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
         _SAT_IDS_SELECTED[i] = false;
-        var c = transferFunction(i);
-        colors[i*3]   = c.r;
-        colors[i*3+1] = c.g;
-        colors[i*3+2] = c.b;
+        var c = colorFunction(i);
+        colors[i*4]   = c.r;
+        colors[i*4+1] = c.g;
+        colors[i*4+2] = c.b;
+        colors[i*4+3] = alphaFunction(i);
     }
     colorsObj.needsUpdate = true;
     _SAT_IDS_SELECTED_COUNT = 0;

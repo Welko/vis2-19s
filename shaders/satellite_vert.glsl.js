@@ -1,8 +1,8 @@
 var satellite_vert = /* glsl */`
 
 attribute float size;
-attribute vec3 color;
-varying vec3 vColor;
+attribute vec4 color;
+varying vec4 vColor;
 
 void main() {
     vColor = color;

@@ -1,7 +1,6 @@
 var _COLOR_MODE_TYPE = 0;
 var _COLOR_MODE_ALTITUDE = 1;
 var _COLOR_MODE_DISTANCE = 2;
-var _COLOR_MODE_SELECTION = 3;
 
 var color_mode = null;
 var transfer_function_base = null;
@@ -22,10 +21,6 @@ function setColorMode(mode) {
         case _COLOR_MODE_DISTANCE:
             initializeColorModeDistance();
             return;
-
-        case _COLOR_MODE_SELECTION:
-            initializeColorModeSelection();
-            return;
     }
     throw "Undefined color mode: " + mode;
 }
@@ -35,7 +30,6 @@ function getSelectedColorModeFromUi() {
         case "type": return _COLOR_MODE_TYPE;
         case "altitude": return _COLOR_MODE_ALTITUDE;
         case "distance": return _COLOR_MODE_DISTANCE;
-        case "selection": return _COLOR_MODE_SELECTION;
     }
     throw "Undefined color mode string: " + _ui_color_select.value;
 }
@@ -50,10 +44,11 @@ function updateSatellitesColor() {
     var colorsObj = sat_points.geometry.attributes.color;
     var colors = colorsObj.array;
     for (var i = 0; i < sat_data.length; i++) {
-        var color = transferFunction(i);
-        colors[i*3]   = color.r;
-        colors[i*3+1] = color.g;
-        colors[i*3+2] = color.b;
+        var color = colorFunction(i);
+        colors[i*4]   = color.r;
+        colors[i*4+1] = color.g;
+        colors[i*4+2] = color.b;
+        colors[i*4+3] = alphaFunction(i);
     }
     colorsObj.needsUpdate = true;
 }
@@ -158,22 +153,15 @@ function initializeColorModeDistance() {
     updateSatellitesColor();
 }
 
-function initializeColorModeSelection() {
-    _ui_color_info_table.innerHTML = addColorHtml(_SAT_COLOR_SELECTED, "Selected")
-                                   + addColorHtml(_SAT_COLOR_NOT_SELECTED, "Not selected");
-    transfer_function_base = transferSelection;
-    updateSatellitesColor();
-}
-
 
 // Transfer functions --------------------------------------------------------------------------------------------------
 
-function transferFunction(sat_id) {
-    if (_SAT_IDS_SELECTED[sat_id]) {
-        return COLOR_SELECTED;
-    } else {
-        return transfer_function_base(sat_id);
-    }
+function colorFunction(sat_id) {
+    return transfer_function_base(sat_id);
+}
+
+function alphaFunction(sat_id) {
+    return _SAT_IDS_SELECTED[sat_id] ? 1 : 0.2;
 }
 
 function getIndexFromRange(value, min, range) {
@@ -188,6 +176,11 @@ function getIndexFromConstantStep(value, start, step) {
 }
 
 function transferType(sat_id) {
+    if (sat_id >= sat_data.length) {
+        console.error("Sat ID too big: " + sat_id + " (length=" + sat_data.length + ")");
+    } else if (sat_data[sat_id] == null) {
+        console.error("Sat data undefined with ID " + sat_id + "(length=" + sat_data.length + ")");
+    }
     var index = satTypesCache.indexOf(sat_data[sat_id].type);
     return satTypesColorCache[index];
 }
@@ -212,8 +205,4 @@ function transferDistance(sat_id) {
     } else {
         return COLOR_UNDEFINED;
     }
-}
-
-function transferSelection(sat_id) {
-    return _SAT_IDS_SELECTED[sat_id] ? COLOR_SELECTED : COLOR_UNSELECTED;
 }
