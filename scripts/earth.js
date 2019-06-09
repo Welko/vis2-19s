@@ -20,7 +20,7 @@ function fillSceneWithEarth(scene) {
     // earth_geometry.rotateY(Math.PI*0.5);
 
     var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
-    var earth_material = new THREE.MeshStandardMaterial({
+    var earth_material = new THREE.MeshToonMaterial({
         map: new THREE.TextureLoader().load('./resources/earth.jpg'),
         bumpMap: earth_bump,
         bumpScale: 0.1,
