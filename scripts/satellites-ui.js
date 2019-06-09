@@ -1,17 +1,9 @@
 var selected_satellite_id = null;
-var selected_satellites_orbits = [];
 var selected_satellites_uis = [];
 var selected_satellites_ids = [];
 
 // Satellite added to list and its extra information
 function addSatelliteToList(sat_id) {
-    if (selected_satellites_ids.includes(sat_id)) return;
-
-    selected_satellite_id = sat_id;
-
-    var selection_line = orbit_line.clone();
-    selection_line.material = selected_orbit_material;
-    orbit_selection_group.add(selection_line);
 
     var data = sat_data[selected_satellite_id];
     var extra = sat_extra[selected_satellite_id];
@@ -49,7 +41,6 @@ function addSatelliteToList(sat_id) {
     satellite_info_box.innerHTML += sat_info;
 
     selected_satellites_ids.push(intersected_satellite);
-    selected_satellites_orbits.push(selection_line);
     selected_satellites_uis.push(document.getElementById("info-" + selected_satellite_id));
 
     if (selected_satellites_uis.length > 1) {
@@ -64,13 +55,11 @@ function flipInfo(sat_id) {
 }
 
 function removeInfo(sat_id) {
-    var index = selected_satellites_ids.indexOf(sat_id);
-    var orbit = selected_satellites_orbits[index];
-    selected_satellites_ids.splice(index, 1);
-    selected_satellites_orbits.splice(index, 1);
-    selected_satellites_uis.splice(index, 1);
+    removeSatellite(sat_id);
 
-    orbit_selection_group.remove(orbit);
+    var index = selected_satellites_ids.indexOf(sat_id);
+    selected_satellites_ids.splice(index, 1);
+    selected_satellites_uis.splice(index, 1);
 
     var reme = document.getElementById("info-" + sat_id);
     reme.parentElement.removeChild(reme);

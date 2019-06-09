@@ -21,13 +21,17 @@ var sat_orbit_arrays = [];
 var in_progress = [];
 var type_colors = null;
 
-var orbit_line;
+var hover_orbit_line;
+var hover_proj_line;
 var position_projection_line;
 var satellite_transform;
 
 var intersected_satellite = null;
 var orbit_selection_group = null;
+var selected_satellite_objects = [];
+
 var selected_orbit_material;
+var selected_proj_material;
 
 var finished_loading = false;
 
@@ -147,8 +151,11 @@ function getSatellites(scene, tle_text) {
     prepareOrbitBuffers(sat_count);
     prepareSatellitePoints(sat_data);
 
-    orbit_line.applyMatrix(satellite_transform);
-    scene.add(orbit_line);
+    hover_orbit_line.applyMatrix(satellite_transform);
+    scene.add(hover_orbit_line);
+    
+    hover_proj_line.applyMatrix(satellite_transform);
+    scene.add(hover_proj_line);
 
     position_projection_line.applyMatrix(satellite_transform);
     scene.add(position_projection_line);
@@ -160,10 +167,17 @@ function getSatellites(scene, tle_text) {
         tle_data : tle_json
     });
 
+    var ground_track_margin_km = 5;
+
     orbitWorker.postMessage({
         is_init : true,
         tle_data : tle_json,
-        segments : ORBIT_SEGMENTS
+        segments : ORBIT_SEGMENTS,
+        earth_scale : [
+            _earth_scale_km[0] + ground_track_margin_km,
+            _earth_scale_km[2] + ground_track_margin_km,
+            _earth_scale_km[1] + ground_track_margin_km]
+
     });
 }
 
@@ -225,6 +239,18 @@ function prepareSatellitePoints(sat_data) {
 
 function prepareOrbitBuffers(count) {
 
+    selected_orbit_material = new THREE.LineBasicMaterial({
+        color: 0xaaaaaa,
+        opacity: 0.75,
+        transparent: true,
+    });
+
+    selected_proj_material = new THREE.LineBasicMaterial({
+        color: 0xaaaa33,
+        opacity: 0.75,
+        transparent: true,
+    });
+
     in_progress = [];
     for (var i = 0; i < ORBIT_SEGMENTS; i++) in_progress[i] = false; // fill with false
     
@@ -236,13 +262,12 @@ function prepareOrbitBuffers(count) {
         linewidth: 2,
     });
 
-    selected_orbit_material = new THREE.LineBasicMaterial({
-        color: 0xaaaaaa,
-        opacity: 0.75,
-        transparent: true,
-    });
+    hover_orbit_line = new THREE.Line(geometry, material);
 
-    orbit_line = new THREE.Line(geometry, material);
+    material = new THREE.LineBasicMaterial({
+        color: 0xffff66,
+    });
+    hover_proj_line = new THREE.Line(geometry.clone(), material);
 
 
     geometry = new THREE.BufferGeometry();
@@ -305,9 +330,14 @@ satelliteWorker.onmessage = function(m) {
 orbitWorker.onmessage = function(m) {
     var sat_id = m.data.sat_id;
     var orbit_points = new Float32Array(m.data.orbit_points);
+    var proj_points = new Float32Array(m.data.proj_points);
 
-    var position = orbit_line.geometry.attributes.position;
+    var position = hover_orbit_line.geometry.attributes.position;
     position.copyArray(orbit_points);
+    position.needsUpdate = true;
+    
+    position = hover_proj_line.geometry.attributes.position;
+    position.copyArray(proj_points);
     position.needsUpdate = true;
 
     in_progress[sat_id] = false;
@@ -319,7 +349,7 @@ function updateSatellites(delta) {
     let position = sat_points.geometry.attributes.position;
     let positions = position.array;
     let now = new Date();
-    for (let i = 0; i < sat_data.length; i++) {
+    for (let i = 0; i < sat_vel.length; i++) {
         //sat_coords[i] = getSatelliteCoords(i, now); // Too slow!
         positions[i] += delta * sat_vel[i];
     }
@@ -334,7 +364,7 @@ function updateSatellites(delta) {
         projs.needsUpdate = true;
     }
 
-    updateSatellitesUi();
+    //updateSatellitesUi();
 }
 
 function resetSatellite(sat_id, scene, sizes) {
@@ -397,5 +427,32 @@ function intersectSatellites(raycaster, scene, container) {
 }
 
 function selectSatellite(sat_id) {
+    if (selected_satellite_objects[sat_id] != null) return; // cancel if satellite is already selected
+
+    selected_satellite_id = sat_id;
+
+    var orbit_line = hover_orbit_line.clone();
+    orbit_line.material = selected_orbit_material;
+    orbit_selection_group.add(orbit_line);
+
+    var projection_line = hover_proj_line.clone();
+    projection_line.material = selected_proj_material;
+    orbit_selection_group.add(projection_line);
+
+    selected_satellite_objects[sat_id] = {
+        orbit: orbit_line,
+        proj: projection_line
+    }
+
     addSatelliteToList(sat_id);
+}
+
+function removeSatellite(sat_id) {
+    if (selected_satellite_objects[sat_id] == null) return; // canel if satellite is not selected
+    
+    orbit_selection_group.remove(selected_satellite_objects[sat_id].orbit);
+    orbit_selection_group.remove(selected_satellite_objects[sat_id].proj);
+
+    selected_satellite_objects[sat_id] = null;
+
 }

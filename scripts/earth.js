@@ -1,4 +1,6 @@
 var earth = null;
+var _earth_scale;
+var _earth_scale_km;
 
 var cone_angle = 0;
 var cone_lookAt_point_normalized = null;
@@ -11,7 +13,10 @@ var _SELECTION_CONE_COLOR_REM = new THREE.Color(0xff4444);
 
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
-    earth_geometry.scale(6.378137, 6.356752, 6.378137); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
+    _earth_scale = [6.378137, 6.356752, 6.378137];
+    _earth_scale_km = [_earth_scale[0] / KM_TO_WORLD_UNITS, _earth_scale[1] / KM_TO_WORLD_UNITS, _earth_scale[2] / KM_TO_WORLD_UNITS];
+    earth_geometry.scale(_earth_scale[0], _earth_scale[1], _earth_scale[2]); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
+
     var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
     var earth_material = new THREE.MeshStandardMaterial({
         map: new THREE.TextureLoader().load('./resources/earth.jpg'),
