@@ -50,16 +50,9 @@ onmessage = function(m) {
 };
 
 function propagate() {
-//  var start = Date.now();
   
-  var now = new Date();   
-  var j = jday(now.getUTCFullYear(), 
-               now.getUTCMonth() + 1, // Note, this function requires months in range 1-12. 
-               now.getUTCDate(),
-               now.getUTCHours(), 
-               now.getUTCMinutes(), 
-               now.getUTCSeconds());
-  j += now.getUTCMilliseconds() * 1.15741e-8; //days per millisecond     
+  var datetime = new Date();   
+  var j = satellite.jday(datetime);  
   var gmst = satellite.gstime(j);
   
   for(var i = 0; i < tle_cache.length; i++) {
@@ -111,15 +104,4 @@ function propagate() {
   sat_geo = new Float32Array(tle_cache.length);
   
   setTimeout(propagate, 500);
-}
-
-function jday(year, mon, day, hr, minute, sec){ //from satellite.js
-  'use strict';
-  return (367.0 * year -
-        Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-        Math.floor( 275 * mon / 9.0 ) +
-        day + 1721013.5 +
-        ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-        //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
-        );
 }

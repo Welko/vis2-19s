@@ -140,6 +140,7 @@ function animate() {
 function render() {
   //updateTime();
   let delta = clock.getDelta();
+  var datetime = new Date(); // TODO: change so every date value uses this an make it configurable
 
   cameraControls.update(delta);
   raycaster.setFromCamera(mouse, camera);
@@ -167,6 +168,7 @@ function render() {
   }
 
   updateSatellites(delta);
+  updateSceneObjects(delta, datetime);
 
   // render scene
   renderer.render(scene, camera);

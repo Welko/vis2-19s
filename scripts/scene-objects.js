@@ -43,9 +43,6 @@ function fillSceneWithObjects(scene) {
     polar_grid.material.transparent = true,
     scene.add(polar_grid);
 
-    var axesHelper = new THREE.AxesHelper(100);
-    scene.add(axesHelper);
-
     var geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(SPACE_ORBIT_SEGMENTS*3), 3));
     var material = new THREE.LineBasicMaterial({
@@ -81,6 +78,10 @@ function fillSceneWithObjects(scene) {
     textureCube.mapping = THREE.CubeRefractionMapping;
     
     scene.background = textureCube;
+}
+
+function updateSceneObjects(delta, datetime) {
+    updateEarth(delta, datetime);
 }
 
 var AU_TO_KM = 149597870.7;

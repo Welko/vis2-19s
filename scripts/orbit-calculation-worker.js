@@ -5,6 +5,8 @@ importScripts('../libs/satellite.js');
 var NUM_SEGS;
 var tle_cache = [];
 var earth_scale;
+var KM_TO_WORLD_UNITS = 0.001;
+var ONE_OVER_KM_TO_WORLD_UNITS = 1 / KM_TO_WORLD_UNITS;
 
 onmessage = function(m) {
   
@@ -26,34 +28,36 @@ onmessage = function(m) {
     var orbit_points = new Float32Array((NUM_SEGS + 1) * 3);
     var proj_points  = new Float32Array((NUM_SEGS + 1) * 3);
     
-    var nowDate = new Date();
-    var gmst = satellite.gstime(nowDate);
-    var nowJ = jday(nowDate.getUTCFullYear(), 
-                 nowDate.getUTCMonth() + 1, 
-                 nowDate.getUTCDate(), 
-                 nowDate.getUTCHours(), 
-                 nowDate.getUTCMinutes(), 
-                 nowDate.getUTCSeconds());
-    nowJ += nowDate.getUTCMilliseconds() * 1.15741e-8; //days per millisecond    
-    var now = (nowJ - tle_cache[sat_id].jdsatepoch) * 1440.0; //in minutes 
+    var datetime = new Date();   
+    var orbit_days = 1;
+    // var end_datetime = new Date(datetime.valueOf());
+    // end_datetime.setDate(end_datetime.getDate() + orbit_days);
+    var j = satellite.jday(datetime);
+    var start_gmst = satellite.gstime(j);
+    // var end_j = satellite.jday(end_datetime);
+    // var j_slice = (end_j - j) / NUM_SEGS;
+
+    var now = (j - tle_cache[sat_id].jdsatepoch) * 1440.0; //in minutes 
     
     var period = (2 * Math.PI) / tle_cache[sat_id].no; //convert rads/min to min
     var timeslice = period / NUM_SEGS;
     
     for(var i = 0; i < NUM_SEGS + 1; i++) {
       var t = now + i*timeslice;
+      var gmst = satellite.gstime(j + (i*timeslice / 1440.0)); //(i*timeslice / 1440.0)//i*j_slice
       var p = satellite.sgp4(tle_cache[sat_id], t).position;
       try {
         orbit_points[i*3]   = p.x;
         orbit_points[i*3+1] = p.y;
         orbit_points[i*3+2] = p.z;
 
-        p = projectPointOntoEarth(p, earth_scale);
+        p = projectPointOntoEarth(p, gmst - start_gmst, earth_scale);
         proj_points[i*3]   = p[0];
         proj_points[i*3+1] = p[1];
         proj_points[i*3+2] = p[2];
 
       } catch (ex) {
+        if (p != undefined) this.console.error(ex);
         orbit_points[i*3]   = 0;
         orbit_points[i*3+1] = 0;
         orbit_points[i*3+2] = 0;
@@ -70,18 +74,39 @@ onmessage = function(m) {
   }
 };
 
-function jday(year, mon, day, hr, minute, sec){ //from satellite.js
-  'use strict';
-  return (367.0 * year -
-        Math.floor((7 * (year + Math.floor((mon + 9) / 12.0))) * 0.25) +
-        Math.floor( 275 * mon / 9.0 ) +
-        day + 1721013.5 +
-        ((sec / 60.0 + minute) / 60.0 + hr) / 24.0  //  ut in days
-        //#  - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
-        );
-}
+function projectPointOntoEarth(p, gmst, scale) {
 
-function projectPointOntoEarth(p, scale) {
-  var sum = Math.sqrt(p.x*p.x + p.y*p.y + p.z*p.z); // sum to normalize
-  return sum === 0 ? [0,0,0] : [p.x/sum*scale[0], p.y/sum*scale[1], p.z/sum*scale[2]];
+  // transform points so length is more accurate (doesn't matter for normal)
+  var x = p.x * KM_TO_WORLD_UNITS;
+  var y = p.y * KM_TO_WORLD_UNITS;
+  var z = p.z * KM_TO_WORLD_UNITS;
+
+  var length = Math.sqrt(x*x + y*y + z*z); // length to normalize
+
+  if (length === 0) return [0, 0, 0]; // break out if error
+
+  var norm_x = x/length * scale[0];
+  var norm_y = y/length * scale[1];
+  var norm_z = z/length * scale[2];
+
+  // https://github.com/shashwatak/satellite-js/blob/develop/src/transforms.js#L126
+  var sx = (norm_x * Math.cos(gmst)) + (norm_y * Math.sin(gmst));
+  var sy = (norm_x * (-Math.sin(gmst))) + (norm_y * Math.cos(gmst));
+  var sz = norm_z;
+
+  // var nx = sx;
+  // var ny = sy;
+  // var nz = sy;
+
+  x = sx;
+  y = sy;
+  z = sz;
+
+  
+
+  // x = (norm_x * Math.cos(gmst)) + (norm_z * Math.sin(gmst));
+  // z = (norm_x * (-Math.sin(gmst))) + (norm_z * Math.cos(gmst));
+  // y = norm_y;
+
+  return [x, y, z];
 }

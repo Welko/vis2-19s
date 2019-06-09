@@ -13,9 +13,11 @@ var _SELECTION_CONE_COLOR_REM = new THREE.Color(0xff4444);
 
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
-    _earth_scale = [6.378137, 6.356752, 6.378137];
+    // _earth_scale = [6.378137, 6.356752, 6.378137];
+    _earth_scale = [6.378137, 6.378137, 6.378137];
     _earth_scale_km = [_earth_scale[0] / KM_TO_WORLD_UNITS, _earth_scale[1] / KM_TO_WORLD_UNITS, _earth_scale[2] / KM_TO_WORLD_UNITS];
     earth_geometry.scale(_earth_scale[0], _earth_scale[1], _earth_scale[2]); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
+    // earth_geometry.rotateY(Math.PI*0.5);
 
     var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
     var earth_material = new THREE.MeshStandardMaterial({
@@ -26,6 +28,9 @@ function fillSceneWithEarth(scene) {
         metalnessMap: earth_bump,
     });
     earth = new THREE.Mesh(earth_geometry, earth_material);
+
+    var axesHelper = new THREE.AxesHelper(100);
+    earth.add(axesHelper);
 
     scene.add(earth);
 
@@ -76,6 +81,14 @@ function positionCone(p) {
 
     selection_cone.lookAt(p);
     scene.add(selection_cone);
+}
+
+
+function updateEarth(delta, datetime) {
+    // deltaaccum += delta;
+    // var newDateObj = new Date(datetime.getTime() + dateshift*60000);
+    var gmst = satellite.gstime(datetime);
+    earth.setRotationFromAxisAngle(new THREE.Vector3(0,1,0), gmst);
 }
 
 function removeCone() {

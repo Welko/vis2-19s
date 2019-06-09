@@ -142,11 +142,18 @@ function getSatellites(scene, tle_text) {
         });
     }
 
-    satellite_transform = new THREE.Matrix4().compose(
-        new THREE.Vector3(), 
-        new THREE.Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), Math.PI * 0.5),
-        new THREE.Vector3(KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS)
-    );
+    // satellite_transform = new THREE.Matrix4().compose(
+    //     new THREE.Vector3(), 
+    //     new THREE.Quaternion().setFromAxisAngle(new Vector3(-1, 0, 0), Math.PI * 0.5),
+    //     new THREE.Vector3(KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS)
+    // );
+    satellite_transform = new THREE.Matrix4();
+    satellite_transform.set( 
+        1, 0, 0, 0,
+        0, 0, 1, 0,
+        0, -1, 0, 0,
+        10, 0, 0, 1 
+    ).scale(new THREE.Vector3(KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS));
 
     prepareOrbitBuffers(sat_count);
     prepareSatellitePoints(sat_data);
@@ -155,7 +162,7 @@ function getSatellites(scene, tle_text) {
     scene.add(hover_orbit_line);
     
     hover_proj_line.applyMatrix(satellite_transform);
-    scene.add(hover_proj_line);
+    scene.add(hover_proj_line); // dont' do that mayb?
 
     position_projection_line.applyMatrix(satellite_transform);
     scene.add(position_projection_line);
@@ -167,7 +174,7 @@ function getSatellites(scene, tle_text) {
         tle_data : tle_json
     });
 
-    var ground_track_margin_km = 5;
+    var ground_track_margin_km = 10;
 
     orbitWorker.postMessage({
         is_init : true,
@@ -175,9 +182,8 @@ function getSatellites(scene, tle_text) {
         segments : ORBIT_SEGMENTS,
         earth_scale : [
             _earth_scale_km[0] + ground_track_margin_km,
-            _earth_scale_km[2] + ground_track_margin_km,
-            _earth_scale_km[1] + ground_track_margin_km]
-
+            _earth_scale_km[1] + ground_track_margin_km,
+            _earth_scale_km[2] + ground_track_margin_km]
     });
 }
 
