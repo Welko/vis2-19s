@@ -83,7 +83,7 @@ function findSatellitesInCone() {
 
     var sat_indexes = [];
     for (var i = 0; i < sat_pos.length; i++) {
-        var p = new THREE.Vector3(sat_pos[i*3], sat_pos[i*3+1], sat_pos[i*3+2]);
+        var p = new THREE.Vector3(sat_pos[i*3], -sat_pos[i*3+2], sat_pos[i*3+1]);
         p.normalize();
 
         var c = cone_lookAt_point_normalized;
