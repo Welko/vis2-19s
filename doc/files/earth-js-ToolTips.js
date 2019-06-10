@@ -1,0 +1,1 @@
+NDContentPage.OnToolTipsLoaded({84:"<div class=\"NDToolTip TFunction LJavaScript\"><div id=\"NDPrototype84\" class=\"NDPrototype NoParameterForm\"><span class=\"SHKeyword\">function</span> render()</div><div class=\"TTSummary\">renders a frame</div></div>"});

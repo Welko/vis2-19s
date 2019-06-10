@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("inc",["Function"],[["includesAll",,[[,,,,0,"File:searcher.js:includesAll"]]]]);
