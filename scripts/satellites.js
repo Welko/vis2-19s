@@ -306,6 +306,11 @@ satelliteWorker.onmessage = function(m) {
         setColorMode(_COLOR_MODE_TYPE);
 
         addAllSatellites();
+
+        // Visibility
+        setPlanetsVisibility(_ui_checkbox_show_planets.checked);
+        setGridsVisibility(_ui_checkbox_show_grids.checked);
+        setEarthAxesVisibility(_ui_checkbox_show_axes.checked);
     }
 
     var position = sat_points.geometry.attributes.position;

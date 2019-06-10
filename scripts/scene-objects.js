@@ -6,6 +6,9 @@ var equatorial_to_ecliptic;
 
 var sun_light;
 
+var scene_grid;
+var scene_polar_grid;
+
 // Function: createSceneBody
 //
 // creates a "scene body", this is the THREE.js buffer representation of an orbital body like the moon, the sun or planets
@@ -53,8 +56,8 @@ function createSceneBody(radius, height, color) {
 function createBody(astronomy_body, radius, height, color) {
     var scene_body = createSceneBody(radius, height, color);
     scene.add(scene_body);
-    addBodyOrbit(scene, astronomy_body, color);
-    bodies.push({ astronomy_body: astronomy_body, scene_object: scene_body });
+    var orbit = addBodyOrbit(scene, astronomy_body, color);
+    bodies.push({ astronomy_body: astronomy_body, scene_object: scene_body, orbit: orbit });
 }
 
 // Function: fillSceneWithObjects
@@ -66,15 +69,15 @@ function createBody(astronomy_body, radius, height, color) {
 //
 function fillSceneWithObjects(scene) {
     // grid
-    var grid = new THREE.GridHelper(1000, 10, 0x666666, 0x333333);
-    grid.material.opacity = 0.5;
-    grid.material.transparent = true,
-    scene.add(grid);
+    scene_grid = new THREE.GridHelper(1000, 10, 0x666666, 0x333333);
+    scene_grid.material.opacity = 0.5;
+    scene_grid.material.transparent = true,
+    scene.add(scene_grid);
     
-    var polar_grid = new THREE.PolarGridHelper(200, 16, 20, 64, 0x666666, 0x666666);
-    polar_grid.material.opacity = 0.5;
-    polar_grid.material.transparent = true,
-    scene.add(polar_grid);
+    scene_polar_grid = new THREE.PolarGridHelper(200, 16, 20, 64, 0x666666, 0x666666);
+    scene_polar_grid.material.opacity = 0.5;
+    scene_polar_grid.material.transparent = true,
+    scene.add(scene_polar_grid);
 
     sun_light = new THREE.DirectionalLight(0xffffff, 0.5);
     scene.add(sun_light);
@@ -184,6 +187,8 @@ function addBodyOrbit(scene, body, color) {
     orbit.geometry.attributes.position.needsUpdate = true;
 
     scene.add(orbit);
+
+    return orbit;
 }
 
 // Function: equatorialToEclipticPlane
@@ -239,4 +244,25 @@ function astronomyCalculation() {
             sun_light.position.z = scene_object_pos.z;
         }
     }
+}
+
+// Function:
+//
+// Parameters:
+//      value - true or false: whether the planets are visible
+function setPlanetsVisibility(value) {
+    for (var i = 0; i < bodies.length; i++) {
+        bodies[i].astronomy_body.visible = value;
+        bodies[i].scene_object.visible = value;
+        bodies[i].orbit.visible = value;
+    }
+}
+
+// Function:
+//
+// Parameters:
+//      value - true or false: whether the grids are visible
+function setGridsVisibility(value) {
+    scene_grid.visible = value;
+    scene_polar_grid.visible = value;
 }

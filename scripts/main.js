@@ -35,6 +35,10 @@ var _ui_search_selected_only;
 var _ui_search_results_row;
 var _ui_search_showing_row;
 var _ui_checkbox_show_unselected_satellites;
+var _ui_checkbox_show_planets;
+var _ui_checkbox_show_grids;
+var _ui_checkbox_show_axes;
+//var _ui_checkbox_texture_earth;
 
 // Function: init
 // initializes the program by hooking up DOM elements with javscript callbacks as well as the canvas
@@ -85,6 +89,15 @@ function init() {
 
     _ui_checkbox_show_unselected_satellites = document.getElementById("cb-show-unselected-satellites");
     _ui_checkbox_show_unselected_satellites.addEventListener("change", updateSatellitesColor);
+
+    _ui_checkbox_show_planets = document.getElementById("cb-show-planets");
+    _ui_checkbox_show_planets.addEventListener("change", function() { setPlanetsVisibility(_ui_checkbox_show_planets.checked); });
+
+    _ui_checkbox_show_grids = document.getElementById("cb-show-grids");
+    _ui_checkbox_show_grids.addEventListener("change", function() { setGridsVisibility(_ui_checkbox_show_grids.checked); });
+
+    _ui_checkbox_show_axes = document.getElementById("cb-show-axes");
+    _ui_checkbox_show_axes.addEventListener("change", function() { setEarthAxesVisibility(_ui_checkbox_show_axes.checked); });
 
     // camera
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
