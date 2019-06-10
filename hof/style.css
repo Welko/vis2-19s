@@ -206,3 +206,12 @@ em {
     color: #377eb8;
 }
 
+.code {
+    color: white;
+    font-family: "Courier New", Courier, monospace;
+    border: 1px solid white;
+    border-radius: 1em;
+    font-size: 0.75em;
+    padding: 0.5em;
+    color: #4daf4a;
+}

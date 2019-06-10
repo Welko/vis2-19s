@@ -46,12 +46,18 @@
         Real-Time Interactive Satellite Tracker (RTIST) is a tool for the exploration of earth's satellites.
 
         Using techniques such as brushing, dynamic queries and details on demand, this application enables users to
-        visualize only the satellites they are interested in. <span class="todo">Sounds bad. Elaborate</span>
+        visualize only the satellites they are interested in.
     </p>
 
     <div class="gallery" id="fig1">
-
-        <div class="caption">Figure 1: A Two-Line Element set. <span class="todo">Elaborate, add image</span> </div>
+        <div class="code">
+            "INTLDES": "58002B", <br/>
+            "OBJECT_NAME": "VANGUARD 1", <br/>
+            "OBJECT_TYPE": "PAYLOAD", <br/>
+            "TLE_LINE1": "1     5U 58002B   19159.78599251 -.00000069 +00000-0 -68986-4 0  9999", <br/>
+            "TLE_LINE2": "2     5 034.2454 302.3058 1842200 106.4760 274.5392 10.84762920164564" <br/>
+        </div>
+        <div class="caption">Figure 1: A Two-Line Element set describing a satellite.</div>
     </div>
 
     <h2>Features</h2>
@@ -81,10 +87,10 @@
 
     </p>
 
-    <div class="doublegallery">
+    <div class="doublegallery" id="fig2">
         <img src="groundtrack_intelsat_4_f3.jpg"></img>
         <img src="groundtrack_molniya_1_63.jpg"></img>
-        <div class="caption">Figure 4: Satellite Ground Tracks of INTELSAT 4-F3 (left) and MOLNIYA 1-63 (right).</div>
+        <div class="caption">Figure 2: Satellite Ground Tracks of INTELSAT 4-F3 (left) and MOLNIYA 1-63 (right).</div>
     </div>
 
     <h3>Brushing</h3>
@@ -92,11 +98,19 @@
         The implemented brushing tool enables the user to select a point the earth's surface, from which the satellites in
         a given radius are selected.
 
-        This selection is visualized in the form of a cone, as shown in <a href="#">Figure 2</a>.
+        This selection is visualized in the form of a cone, as shown in <a href="#">Figure 3</a>.
 
         With this tool, users can brush over a region on earth (e.g., countries or continents) and find all satellites currently
         over the defined area.
     </p>
+
+    <div class="doublegallery" id="fig3">
+        <img src="brush_green.jpg"></img>
+        <img src="brush_red.jpg"></img>
+        <div class="caption">
+            Figure 3: Brushing on the surface of the earth can select (left) or unselect (right) satellites.
+        </div>
+    </div>
 
     <h3>Details on demand</h3>
     <p>
@@ -111,12 +125,6 @@
         By clicking on a 3D point or on the name of a satellite on a search result, all details about that satellite are
         displayed in a list.
     </p>
-
-    <div class="doublegallery">
-        <img src="brush_green.jpg"></img>
-        <img src="brush_red.jpg"></img>
-        <div class="caption">Figure 4: Caption.</div>
-    </div>
 
     <h3>Search</h3>
     <p>
