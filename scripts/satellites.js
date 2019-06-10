@@ -317,13 +317,28 @@ orbitWorker.onmessage = function(m) {
     var orbit_points = new Float32Array(m.data.orbit_points);
     var proj_points = new Float32Array(m.data.proj_points);
 
-    var position = hover_orbit_line.geometry.attributes.position;
-    position.copyArray(orbit_points);
-    position.needsUpdate = true;
+    var orbit_position;
+    var proj_position;
+
+    if (sat_id == intersected_satellite) {
+        orbit_position = hover_orbit_line.geometry.attributes.position;
+        proj_position = hover_proj_line.geometry.attributes.position;
+    } else {
+        if (selected_satellite_objects[sat_id] == null) {
+            console.error("no receiver for orbit points");
+            return;
+        }
+
+        orbit_position = selected_satellite_objects[sat_id].orbit.geometry.attributes.position;
+        proj_position = selected_satellite_objects[sat_id].proj.geometry.attributes.position;
+    }
+
+    orbit_position.copyArray(orbit_points);
+    orbit_position.needsUpdate = true;
+
+    proj_position.copyArray(proj_points);
+    proj_position.needsUpdate = true;
     
-    position = hover_proj_line.geometry.attributes.position;
-    position.copyArray(proj_points);
-    position.needsUpdate = true;
 
     in_progress[sat_id] = false;
 };
@@ -461,6 +476,7 @@ function intersectSatellites(raycaster, container) {
 // Function: selectSatellite
 //
 // selects a satellite - that is displaying its orbit, ground track and information continously even if not hovered over
+// called only when hovering + click (because then we already have the orbit and projection line)
 //
 // Parameters:
 //      sat_id - id of the satellite that should become selected
@@ -469,6 +485,20 @@ function selectSatellite(sat_id) {
     if (selected_satellite_objects[sat_id] != null) return; // cancel if satellite is already selected
 
     selected_satellite_id = sat_id;
+    cloneOrbitAndProjection(sat_id);
+
+    addSatelliteToList(sat_id);
+}
+
+// Function: cloneOrbitAndProjection
+//
+// clones the THREE.js buffers of the orbit and the projection line so they can be displayed
+//
+// Parameters:
+//      sat_id - id of the satellite that should become selected
+//
+function cloneOrbitAndProjection(sat_id) {
+    if (selected_satellite_objects[sat_id] != null) return; // cancel if satellite is already selected
 
     var orbit_line = hover_orbit_line.clone();
     orbit_line.material = selected_orbit_material;
@@ -482,8 +512,21 @@ function selectSatellite(sat_id) {
         orbit: orbit_line,
         proj: projection_line
     }
+}
 
-    addSatelliteToList(sat_id);
+// Function: displaySatelliteOrbit
+//
+// display a satellites orbit, ground track and information continously even if not hovered over,
+// called if added to the details list (also from the outside)
+//
+// Parameters:
+//      sat_id - id of the satellite that should become selected
+//
+function displaySatelliteOrbit(sat_id) {
+    if (selected_satellite_objects[sat_id] != null) return; // cancel if satellite is already selected (when clicked from ui)
+
+    cloneOrbitAndProjection(sat_id);
+    updateOrbitBuffer(sat_id);
 }
 
 // Function: removeSatellite
