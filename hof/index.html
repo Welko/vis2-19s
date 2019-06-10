@@ -22,7 +22,7 @@
     </div>
 </div>
 
-<img style="width: 100%" src="header_long2.jpg"></img>
+<img style="width: 100%" src="header_long.jpg"></img>
 
 <div class="main">
 
@@ -60,21 +60,21 @@
     <h3>Real time tracking</h3>
     <p>
         In order to deliver a reasonably accurate visualization of satellites and, at the same time, smooth the user's
-        interactions (crucial for exploration applications), RTIST periodically fetches TLE data from online providers.
+        interactions (crucial for exploration applications), RTIST periodically calculates every satellite's
+        position and velocity using the TLE data. As this task uses expensive calculations, this is done "only" twice a second.
 
-        For a given short time interval <span class="todo">How much time?</span>, the satellite's velocity is used to estimate its
-        position.
-    </p>
-
-    <p>
-        After each short interval, every satellite's new position and velocity are calculated based on the cached TLE data.
-
-        This is done multiple times for a longer time interval <span class="todo">How much time?</span>, after which the TLE data is fetched again.
+        For the time between, the satellite's velocity is used to estimate its position every frame.
     </p>
 
     <h3>Ground track visualization</h3>
-    <p>Blablabla</p>
-    <p>Coordinate transforms</p>
+    <p>
+        The ground track of the satellite is the projected (future) position of the satellite onto the surface of the earth.
+        For this, the rotational speed using the sidereal time has to be taken into account, as the earth rotated below the satellite.
+        In general two geocentric coordinate systems ECF and ECI are used. ECF does not include the rotation of earth, it is therefore
+        fixed relative to other objects in the solar system. The ECI coordinate system on the other hand is fixed to the location
+        on the ground and therefore rotates together with earths rotation.
+
+    </p>
 
     <h3>Brushing</h3>
     <p>
@@ -85,10 +85,6 @@
 
         With this tool, users can brush over a region on earth (countries, continents) and find all satellites currently
         over the defined area.
-    </p>
-
-    <p>
-        <span class="todo">Brush angle slider</span>
     </p>
 
     <h3>Search</h3>
