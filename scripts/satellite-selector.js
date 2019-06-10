@@ -123,6 +123,16 @@ function updateSatellitesCount() {
     _ui_satellites_count.innerHTML = _SAT_IDS_SELECTED_COUNT;
 }
 
+function areAllSatellitesSelected(sat_indexes) {
+    for (var i = 0; i < sat_indexes.length; i++) {
+        var index = sat_indexes[i];
+        if (!_SAT_IDS_SELECTED[index]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Input: a1: a sorted array with no repeating elements
 //        a2: a sorted array with no repeating elements
 // Output: one sorted array, the union of a1 and a2 (=> common elements are discarded!)
