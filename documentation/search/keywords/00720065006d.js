@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("rem",["Function"],[["removeSatellite",,[[,,,,0,"File:satellites.js:removeSatellite"]]]]);

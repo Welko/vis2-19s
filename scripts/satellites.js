@@ -40,11 +40,8 @@ var finished_loading = false;
 // loads the TLE json
 //
 // Parameters:
-//    callback - callback that will get invoked on completion
-//    path - path to the TLE file
-//
-// Returns:
-//    nothing TODO; remove
+//      callback - callback that will get invoked on completion
+//      path - path to the TLE file
 //
 function loadJSON(callback, path) {   
     var xobj = new XMLHttpRequest();
@@ -59,10 +56,26 @@ function loadJSON(callback, path) {
     xobj.send(null);  
  }
 
+
+// Function: startSatelliteLoading
+//
+// starts loading satellite data (local for now)
+//
+// Parameters:
+//      scene - reference to the THREE.js scene
+//
 function startSatelliteLoading(scene) {
     loadJSON(function(text) { getSatellites(scene, text); }, "./resources/TLE.json");
 }
 
+// Function: getSatellites
+//
+// parses the satellites from the given TLE data
+//
+// Parameters:
+//      scene - reference to the THREE.js scene
+//      tle_text - string containing a json of TLE data
+//
 function getSatellites(scene, tle_text) {
     tle_json = JSON.parse(tle_text);
 
@@ -93,8 +106,8 @@ function getSatellites(scene, tle_text) {
         10, 0, 0, 1 
     ).scale(new THREE.Vector3(KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS, KM_TO_WORLD_UNITS));
 
-    prepareOrbitBuffers(sat_count);
-    prepareSatellitePoints(sat_data);
+    prepareOrbitBuffers();
+    prepareSatellitePoints(sat_count);
 
     hover_orbit_line.applyMatrix(satellite_transform);
     scene.add(hover_orbit_line);
@@ -128,16 +141,23 @@ function getSatellites(scene, tle_text) {
     });
 }
 
-function prepareSatellitePoints(sat_data) {
+// Function: prepareSatellitePoints
+//
+// initializes the THREE.js buffers for rendering the satellite point cloud
+//
+// Parameters:
+//      sat_count - number of satellites to be stored
+//
+function prepareSatellitePoints(sat_count) {
 
     var sizes = [];
-    for (var i = 0; i < sat_data.length; i++) {
+    for (var i = 0; i < sat_count; i++) {
         sizes.push(SATELLITE_SIZE);
     }
 
     let geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
-    geometry.addAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*4), 4).setDynamic(true));
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_count*3), 3).setDynamic(true));
+    geometry.addAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(sat_count*4), 4).setDynamic(true));
     geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
     //geometry.computeBoundingSphere();
 
@@ -153,7 +173,9 @@ function prepareSatellitePoints(sat_data) {
     sat_points = new THREE.Points(geometry, material);
 }
 
-function prepareOrbitBuffers(count) {
+// Function: prepareSatellitePoints
+// prepares the THREE.js buffers for rendering the orbits
+function prepareOrbitBuffers() {
 
     selected_orbit_material = new THREE.LineBasicMaterial({
         color: 0xaaaaaa,
@@ -199,6 +221,14 @@ function prepareOrbitBuffers(count) {
     position_projection_line = new THREE.Line(geometry, material);
 }
 
+
+// Function: updateOrbitBuffer
+//
+// requests the orbit worker to get an update of the given satellite's orbit
+//
+// Parameters:
+//      sat_id - id of the satellite whose orbit should get updated
+//
 function updateOrbitBuffer(sat_id) {
     if(in_progress[sat_id]) return; // cancel because orbit is currently calculated
 
@@ -211,10 +241,14 @@ function updateOrbitBuffer(sat_id) {
     in_progress[sat_id] = true;
 };
 
+// Function: updateSatelliteDateRelevantInfos
+// updates the date dependent code for the satellites
 function updateSatelliteDateRelevantInfos() {
     updateSatelliteCalculationWorker();
 }
 
+// Function: updateSatelliteCalculationWorker
+// updates the satellites calculation worker by giving it the current time
 function updateSatelliteCalculationWorker() {
     satelliteWorker.postMessage({
         datetime : _datetime,
@@ -223,6 +257,16 @@ function updateSatelliteCalculationWorker() {
 }
 
 var got_extra_data = false;
+
+// Function: satelliteWorker.onmessage
+//
+// handles incoming messages from the satelliteWorker, which are updates on 
+// position, velocity and geo information of all satellites
+// gets called approx. twice a second 
+//
+// Parameters:
+//      m - message object from the worker, contains position, velocity and geo information arrays
+//
 satelliteWorker.onmessage = function(m) {
 
     if(!got_extra_data) {
@@ -255,6 +299,14 @@ satelliteWorker.onmessage = function(m) {
     updateSatellitesUi();
 };
 
+// Function: orbitWorker.onmessage
+//
+// handles incoming messages from the orbitWorker
+// which are updates of the orbit and ground track of one satellite
+//
+// Parameters:
+//      m - message object from the worker, contains orbit and ground track (proj) points
+//
 orbitWorker.onmessage = function(m) {
     var sat_id = m.data.sat_id;
     var orbit_points = new Float32Array(m.data.orbit_points);
@@ -271,6 +323,14 @@ orbitWorker.onmessage = function(m) {
     in_progress[sat_id] = false;
 };
 
+// Function: updateSatellites
+//
+// updates the position of all satellites by adding the delta time scaled velocity vector
+// gets called every frame in the rendering loop!
+//
+// Parameters:
+//      delta - passed delta time since last frame in seconds
+//
 function updateSatellites(delta) {
     if (!finished_loading) return;
 
@@ -291,16 +351,30 @@ function updateSatellites(delta) {
         projs.array[2] = positions[intersected_satellite*3+2];
         projs.needsUpdate = true;
     }
-
-    //updateSatellitesUi();
 }
 
-function resetSatellite(sat_id, scene, sizes) {
+// Function: resetSatellite
+//
+// resets a selected satellite
+//
+// Parameters:
+//      sat_id - the id of the satellite which should henceforth be displayed as just a simple satellite, trying to make its way in the universe. 🛰
+//      sizes - THREE.js buffer for updating the satellites size
+//
+function resetSatellite(sat_id, sizes) {
     sizes.array[sat_id] = SATELLITE_SIZE;
     sizes.needsUpdate = true;
 }
 
-function highlightSatellite(sat_id, scene, sizes) {
+// Function: highlightSatellite
+//
+// highlights a satellite, that is the satellite currently under the cursor (hovered)
+//
+// Parameters:
+//      sat_id - the id of the satellite which is now going to be amongst the stars 🤩
+//      sizes - THREE.js buffer for updating the satellites size
+//
+function highlightSatellite(sat_id, sizes) {
     updateOrbitBuffer(sat_id);
 
     sizes.array[sat_id] = SATELLITE_SIZE * 1.5;
@@ -312,12 +386,28 @@ function highlightSatellite(sat_id, scene, sizes) {
     satellite_nameplate.style.display = "inherit";
 }
 
+// Function: unhighlightSatellites
+//
+// unhighlights - for the lack of a better word - a satellite, that is the satellite that was previously under the cursor is under it no more
+//
+// Parameters:
+//      sat_id - the id of the satellite which is no going to be amongst the stars✨
+//      sizes - THREE.js buffer for updating the satellites size
+//
 function unhighlightSatellites() {
     satellite_nameplate.innerHTML = "";
     satellite_nameplate.style.display = "none";
 }
 
-function intersectSatellites(raycaster, scene, container) {
+// Function: intersectSatellites
+//
+// intersects the satellite cloud using the given raycaster, used for deciding which satellite is below the cursor
+//
+// Parameters:
+//      raycaster - THREE.js raycaster object of the scene
+//      container - DOM element handle for changing the cursor
+//
+function intersectSatellites(raycaster, container) {
     if (!finished_loading) return false;
 
     var geometry = sat_points.geometry;
@@ -329,9 +419,9 @@ function intersectSatellites(raycaster, scene, container) {
         if (_SAT_IDS_SELECTED[index]) {
             if (intersected_satellite !== index) {
                 // This satellite is selected AND it's a different satellite than the one intersected previously
-                resetSatellite(intersected_satellite, scene, attributes.size);
+                resetSatellite(intersected_satellite, attributes.size);
                 intersected_satellite = index;
-                highlightSatellite(intersected_satellite, scene, attributes.size);
+                highlightSatellite(intersected_satellite, attributes.size);
             }
             container.style.cursor = "pointer";
             return true;
@@ -340,7 +430,7 @@ function intersectSatellites(raycaster, scene, container) {
 
     if (intersected_satellite !== null) {
         container.style.cursor = "auto";
-        resetSatellite(intersected_satellite, scene, attributes.size);
+        resetSatellite(intersected_satellite, attributes.size);
         unhighlightSatellites();
         intersected_satellite = null;
     }
@@ -348,6 +438,13 @@ function intersectSatellites(raycaster, scene, container) {
     return false;
 }
 
+// Function: selectSatellite
+//
+// selects a satellite - that is displaying its orbit, ground track and information continously even if not hovered over 
+//
+// Parameters:
+//      sat_id - id of the satellite that should become selected
+//
 function selectSatellite(sat_id) {
     if (selected_satellite_objects[sat_id] != null) return; // cancel if satellite is already selected
 
@@ -369,6 +466,13 @@ function selectSatellite(sat_id) {
     addSatelliteToList(sat_id);
 }
 
+// Function: removeSatellite
+//
+// removes a selected satellite - orbit, ground track and information will not be shown anymore
+//
+// Parameters:
+//      sat_id - id of the satellite whose orbit, ground track and information should not be visible anymore
+//
 function removeSatellite(sat_id) {
     if (selected_satellite_objects[sat_id] == null) return; // canel if satellite is not selected
     
