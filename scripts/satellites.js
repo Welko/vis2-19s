@@ -290,6 +290,8 @@ satelliteWorker.onmessage = function(m) {
         scene.add(sat_points); 
 
         setColorMode(_COLOR_MODE_TYPE);
+
+        addAllSatellites();
     }
 
     var position = sat_points.geometry.attributes.position;

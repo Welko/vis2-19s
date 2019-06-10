@@ -62,6 +62,27 @@ function setSelectedSatellites(sat_indexes, value) {
     return count;
 }
 
+function setAllSatellites(value, update_search=true) {
+    var all = new Array(_SAT_IDS_SELECTED.length);;
+    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
+        all[i] = i;
+    }
+    setSelectedSatellites(all, value);
+    _SAT_IDS_SELECTED_COUNT = value ? _SAT_IDS_SELECTED.length : 0;
+    updateSatellitesCount()
+    if (update_search) {
+        onSearchParamsChanged();
+    }
+}
+
+function addAllSatellites() {
+    setAllSatellites(true);
+}
+
+function removeAllSatellites() {
+    removeAllSatellites(false);
+}
+
 function toggleSelectedSatellites(sat_indexes, update_search=true) {
     var add = [];
     var remove = [];
