@@ -231,7 +231,7 @@ function initializeColorModeDistance() {
 //      the RGB color
 //
 function colorFunction(sat_id) {
-    return transfer_function_base(sat_id);
+    return _SAT_IDS_SELECTED[sat_id] ? transfer_function_base(sat_id) : new THREE.Color(0.5, 0.5, 0.5);
 }
 
 // Function: alphaFunction
