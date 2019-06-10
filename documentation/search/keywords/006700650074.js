@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("get",["Function"],[["getSatellites",,[[,,,,0,"File:satellites.js:getSatellites"]]]]);

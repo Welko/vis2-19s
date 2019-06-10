@@ -245,7 +245,7 @@ function render() {
 
   // Intersect satellites
   if (plsIntersect && !f_ctrl_down && !f_shift_down && sat_points != null) { // not good to use sat_points here! (bc assume global scale)
-    plsIntersect = ! intersectSatellites(raycaster, scene, container);
+    plsIntersect = ! intersectSatellites(raycaster, container);
   }
 
   updateSatellites(delta);
