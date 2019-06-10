@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ini",["Function"],[["Init",,[[,,,,0,"File:main.js:Init"]]]]);

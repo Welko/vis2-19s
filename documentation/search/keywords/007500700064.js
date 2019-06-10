@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("upd",["Function"],[["updateDateRelevantInfos",,[[,,,,0,"File:main.js:updateDateRelevantInfos"]]],["updateTime",,[[,,,,0,"File:main.js:updateTime"]]]]);

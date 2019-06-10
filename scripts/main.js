@@ -11,6 +11,7 @@ var camera, scene, renderer;
 var cameraControls;
 var satellite_nameplate;
 var satellite_info_box;
+var time_input;
 
 var mouse, mouse_screen, raycaster;
 
@@ -29,6 +30,8 @@ var _ui_color_info_table;
 var _ui_search;
 var _ui_search_table;
 
+// Function: Init
+// initializes the program by hooking up DOM elements with javscript callbacks as well as the canvas
 function init() {
 
   _datetime = new Date();
@@ -39,13 +42,7 @@ function init() {
   _ui_satellites_count = document.getElementById('satellites-count');
   _ui_color_info_table = document.getElementById('color-info-table');
 
-  var time_input = document.getElementById('timeinput');
-
-  var update_time = function() {
-    var minutes = time_input.value;
-    _datetime = new Date(new Date().getTime() + minutes*60000);
-    updateDateRelevantInfos();
-  }
+  time_input = document.getElementById('timeinput');
 
   time_input.oninput = update_time;
   // time_input.onchange = update_time;
@@ -106,17 +103,31 @@ function init() {
   fillScene();
 }
 
+// Function: updateTime
+// updates the time according to the slider value
+function updateTime() {
+  var minutes = time_input.value;
+  _datetime = new Date(new Date().getTime() + minutes*60000);
+  updateDateRelevantInfos();
+}
+
+// Function: onWindowResize
+// called when window dimensions change, adjusts canvas size
 function onWindowResize(event) {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+// Function: updateDateRelevantInfos
+// updates the date dependent code immediately
 function updateDateRelevantInfos() {
   updateSceneObjectDateRelevantInfos();
   updateSatelliteDateRelevantInfos();
 }
 
+// Function: onKeyDown
+// called when key is pressed
 function onKeyDown(event) {
     switch (event.keyCode) {
         case 16: // SHIFT (add satellites to selection)
@@ -132,6 +143,8 @@ function onKeyDown(event) {
     }
 }
 
+// Function: onKeyUp
+// called when key is released
 function onKeyUp(event) {
     switch (event.keyCode) {
         case 16: // SHIFT (add satellites to selection)
@@ -144,6 +157,8 @@ function onKeyUp(event) {
     }
 }
 
+// Function: onMouseDown
+// called when mouse button is pressed
 function onMouseDown(event) {
   f_drag = true;
   switch (event.button) {
@@ -156,12 +171,16 @@ function onMouseDown(event) {
   }
 }
 
+// Function: onMouseUp
+// called when mouse button is released
 function onMouseUp(event) {
     f_drag = false;
     cameraControls.enabled = true;
     removeCone();
 }
 
+// Function: onMouseMove
+// called when mouse is moved
 function onMouseMove(event) {
     event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -170,11 +189,15 @@ function onMouseMove(event) {
     mouse_screen.y = event.clientY;
 }
 
+// Function: animate
+// requests the animation frames for the canvas, starts the rendering process
 function animate() {
   requestAnimationFrame(animate);
   render();
 }
 
+// Function: render
+// renders a frame
 function render() {
   //updateTime();
   let delta = clock.getDelta();
@@ -219,16 +242,13 @@ function render() {
   renderer.render(scene, camera);
 }
 
+// Function: fillScene
+// fills the scene with objects (called once initially and if scene has to be populatet again like on context loss)
 function fillScene() {
   scene = new THREE.Scene();
-  // scene.fog = new THREE.Fog(0x050505, 2000, 3500);
   scene.add(camera);
 
-  // lights
-  scene.add(new THREE.AmbientLight(0x000000));
-
   fillSceneWithObjects(scene);
-
   startSatelliteLoading(scene);
 }
 

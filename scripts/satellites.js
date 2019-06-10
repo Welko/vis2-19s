@@ -35,6 +35,17 @@ var selected_proj_material;
 
 var finished_loading = false;
 
+// Function: loadJSON
+//
+// loads the TLE json
+//
+// Parameters:
+//    callback - callback that will get invoked on completion
+//    path - path to the TLE file
+//
+// Returns:
+//    nothing TODO; remove
+//
 function loadJSON(callback, path) {   
     var xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
