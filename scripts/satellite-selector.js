@@ -77,7 +77,7 @@ function toggleSelectedSatellites(sat_indexes, update_search=true) {
     addSelectedSatellites(add, false);
     removeSelectedSatellites(remove, false);
     if (update_search) {
-        updateSearchSelectButtons();
+        onSearchParamsChanged();
     }
 }
 
@@ -86,7 +86,7 @@ function addSelectedSatellites(sat_indexes, update_search=true) {
     _SAT_IDS_SELECTED_COUNT += changedCount;
     updateSatellitesCount()
     if (update_search) {
-        updateSearchSelectButtons();
+        onSearchParamsChanged();
     }
 }
 
@@ -95,7 +95,7 @@ function removeSelectedSatellites(sat_indexes, update_search=true) {
     _SAT_IDS_SELECTED_COUNT -= changedCount;
     updateSatellitesCount();
     if (update_search) {
-        updateSearchSelectButtons();
+        onSearchParamsChanged();
     }
 }
 
@@ -115,7 +115,7 @@ function clearSatelliteSelection(update_search=true) {
     _SAT_IDS_SELECTED_COUNT = 0;
     updateSatellitesCount();
     if (update_search) {
-        updateSearchSelectButtons();
+        onSearchParamsChanged();
     }
 }
 

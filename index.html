@@ -22,7 +22,10 @@
       <table id="color-info-table">
       </table>
     </div>
-    <div id="satellite-info-box"></div>
+    <div class="panel">
+      Details
+      <div id="satellite-info-box"></div>
+    </div>
   </div>
   <div id="overlay-left" class="overlay-panel">
     <div class="panel">
@@ -36,8 +39,9 @@
       Search
       <input id="search" type="text"/>
       <table>
-        <tr><td>Results</td><td id="search-results">0</td></tr>
-        <tr><td>Showing</td><td id="search-showing">0</td></tr>
+        <tr><td><input id="checkbox-search-only-selected" type="checkbox" checked>Search only selected</td></tr>
+        <tr id="search-results-row"><td>Results</td><td id="search-results">0</td></tr>
+        <tr id="search-showing-row"><td>Showing</td><td id="search-showing">0</td></tr>
       </table>
       <table id="search-table"></table>
     </div>

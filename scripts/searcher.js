@@ -4,7 +4,7 @@ var _ui_search_buttons = [];
 var search_results_ids = [];
 var search_results_showing = 0;
 
-function onSearchTextChanged() {
+function onSearchParamsChanged() {
     var text = _ui_search.value;
     search(text);
 }
@@ -14,9 +14,18 @@ function search(string) {
     if (string.length === 0) {
         _ui_search_table.innerHTML = "";
         _ui_search_results.innerHTML = "0 / " + sat_data.length;
-        _ui_search_showing.innerHTML = "0 / " + SEARCH_LIMIT;
+        _ui_search_showing.innerHTML = "0";
+
+        _ui_search_results_row.style.display = "none";
+        _ui_search_showing_row.style.display = "none";
+
         return;
     }
+
+    _ui_search_showing_row.style.display = "";
+    _ui_search_results_row.style.display = "";
+
+    var search_selected_only = _ui_search_selected_only.checked;
 
     // Trim: remove leading and trailing spaces
     var parts = string.trim().toUpperCase().split(" ");
@@ -48,10 +57,15 @@ function search(string) {
 
     var i = 0, j = 0;
     for (; i < sat_data.length && j < SEARCH_LIMIT; i++) {
+
+        if (search_selected_only && !_SAT_IDS_SELECTED[i]) {
+            continue;
+        }
+
         var data = sat_data[i];
         if (matches(data, incl, lack)) {
             var row = document.createElement("tr");
-            row.innerHTML = "<td>" + data.name + "</td>"
+            row.innerHTML = "<td class='clickable' onclick='onTableNameClicked(" + i + ")'>" + data.name + "</td>"
                           + "<td>" + data.type + "</td>";
 
             var button = document.createElement("button");
@@ -71,21 +85,28 @@ function search(string) {
             j++;
         }
     }
-    _ui_search_showing.innerHTML = j + " / " + SEARCH_LIMIT;
+    var showing = j;
     search_results_showing = j-1;
 
     // Continue search, but don't add to DOM
     for (; i < sat_data.length; i++) {
         var data = sat_data[i];
         if (matches(data, incl, lack)) {
+            search_results_ids.push(i);
             j++;
         }
     }
     _ui_search_results.innerHTML = j + " / " + sat_data.length;
+    _ui_search_showing.innerHTML = showing;
+}
+
+function onTableNameClicked(sat_id) {
+    addSatelliteToList(sat_id);
 }
 
 function onTableSelectButtonClicked(sat_id) {
     toggleSelectedSatellites([sat_id]);
+    //addSatelliteToList(sat_id);
 }
 
 function onTableSelectAllClicked() {
@@ -94,6 +115,7 @@ function onTableSelectAllClicked() {
     } else {
         addSelectedSatellites(search_results_ids);
     }
+    //addSatellitesToList(search_results_ids);
 }
 
 function updateSearchSelectButtons() {
@@ -148,29 +170,5 @@ function lacksAll(a, b) {
 }
 
 function initializeSearcher() {
-    /*
-    var html = "<tr>"
-             + "<th>Name</th>"
-             + "<th>Type</th>"
-             + "<th>Selected</th>"
-             + "</tr>";
-
-    _ui_search_table.innerHTML = html;
-
-    _ui_table_rows_array = [];
-    for (var i = 0; i < sat_data.length; i++) {
-
-        var data = sat_data[i];
-
-        var button = document.createElement("button");
-
-        var row = document.createElement("tr");
-        row.innerHTML = "<td>" + data.name + "</td>"
-                     +  "<td>" + data.type + "</td>"
-                     +  "<td>" + _SAT_IDS_SELECTED[i] + "</td>";
-
-        _ui_table_rows_array.push(row);
-        _ui_search_table.appendChild(row);
-    }
-    */
+    onSearchParamsChanged();
 }

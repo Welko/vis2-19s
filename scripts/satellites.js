@@ -135,13 +135,13 @@ function prepareSatellitePoints(sat_data) {
         sizes.push(SATELLITE_SIZE);
     }
 
-    let geometry = new THREE.BufferGeometry();
+    var geometry = new THREE.BufferGeometry();
     geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*3), 3).setDynamic(true));
     geometry.addAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(sat_data.length*4), 4).setDynamic(true));
     geometry.addAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setDynamic(true));
     //geometry.computeBoundingSphere();
 
-    let material = new THREE.ShaderMaterial( {
+    var material = new THREE.ShaderMaterial( {
         uniforms: {
             texture: { value: new THREE.TextureLoader().load("./resources/circle.png") }
         },
@@ -274,10 +274,10 @@ orbitWorker.onmessage = function(m) {
 function updateSatellites(delta) {
     if (!finished_loading) return;
 
-    let position = sat_points.geometry.attributes.position;
-    let positions = position.array;
-    let now = new Date();
-    for (let i = 0; i < sat_vel.length; i++) {
+    var position = sat_points.geometry.attributes.position;
+    var positions = position.array;
+    var now = new Date();
+    for (var i = 0; i < sat_vel.length; i++) {
         //sat_coords[i] = getSatelliteCoords(i, now); // Too slow!
         positions[i] += delta * sat_vel[i];
     }

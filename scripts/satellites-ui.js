@@ -2,32 +2,42 @@ var selected_satellite_id = null;
 var selected_satellites_uis = [];
 var selected_satellites_ids = [];
 
+function addSatellitesToList(sat_ids) {
+    for (var i = 0; i < sat_ids.length; i++) {
+        addSatelliteToList(sat_ids[i]);
+    }
+}
+
 // Satellite added to list and its extra information
 function addSatelliteToList(sat_id) {
 
-    var data = sat_data[selected_satellite_id];
-    var extra = sat_extra[selected_satellite_id];
+    if (detailsListContainsSatellide(sat_id)) {
+         return;
+    }
+
+    var data = sat_data[sat_id];
+    var extra = sat_extra[sat_id];
 
     var sat_info = document.createElement("div");
-    sat_info.setAttribute("id", "info-" + selected_satellite_id);
+    sat_info.setAttribute("id", "info-" + sat_id);
     sat_info.classList.add("satellite-info");
 
     var h1 = document.createElement("h1");
-    h1.innerHTML = sat_data[selected_satellite_id].name;
+    h1.innerHTML = sat_data[sat_id].name;
     h1.classList.add("clickable");
-    h1.setAttribute("onclick", "onSelectedSatelliteNameClicked(" + selected_satellite_id + ")");
+    h1.setAttribute("onclick", "onSelectedSatelliteNameClicked(" + sat_id + ")");
     sat_info.appendChild(h1);
 
     var div = "<div class='info-buttons'>";
-    div += "<button class='flip-button' onclick='flipInfo(" + selected_satellite_id + ")'></button>";
-    div += "<button class='remove-button' onclick='removeInfo(" + selected_satellite_id + ")'></button>";
+    div += "<button class='flip-button' onclick='flipInfo(" + sat_id + ")'></button>";
+    div += "<button class='remove-button' onclick='removeInfo(" + sat_id + ")'></button>";
     div += "</div><table>";
 
         div += "<tr><td>Type</td><td>" + data.type + "</td></tr>";
 
-        div += "<tr><td>Latitude</td><td id='lat-"+selected_satellite_id+"'></td></tr>";
-        div += "<tr><td>Longitude</td><td id='lon-"+selected_satellite_id+"'></td></tr>";
-        div += "<tr><td>Altitude</td><td id='alt-"+selected_satellite_id+"'></td></tr>";
+        div += "<tr><td>Latitude</td><td id='lat-"+sat_id+"'></td></tr>";
+        div += "<tr><td>Longitude</td><td id='lon-"+sat_id+"'></td></tr>";
+        div += "<tr><td>Altitude</td><td id='alt-"+sat_id+"'></td></tr>";
 
         div += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
         div += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
@@ -49,8 +59,8 @@ function addSatelliteToList(sat_id) {
 
     satellite_info_box.appendChild(sat_info);
 
-    selected_satellites_ids.push(intersected_satellite);
-    selected_satellites_uis.push(document.getElementById("info-" + selected_satellite_id));
+    selected_satellites_ids.push(sat_id);
+    selected_satellites_uis.push(document.getElementById("info-" + sat_id));
 
     if (selected_satellites_uis.length > 1) {
         for (var i = 0; i < selected_satellites_uis.length; i++) {
@@ -78,6 +88,10 @@ function updateSatellitesUi() {
     for (var i = 0; i < selected_satellites_ids.length; i++) {
         updateSatelliteUi(i);
     }
+}
+
+function detailsListContainsSatellide(sat_id) {
+    return document.getElementById("info-" + sat_id) != null;
 }
 
 function updateSatelliteUi(index) {

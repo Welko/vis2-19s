@@ -139,7 +139,7 @@ th { /* Table header */
 #overlay-right {
   background-color: #3f3f3fc7;
   height: 100%;
-  width: 18em;
+  width: 20em;
   right: 0;
   left: auto;
   position: absolute;
@@ -149,7 +149,7 @@ th { /* Table header */
 #overlay-left {
   background-color: #3f3f3fc7;
   height: 100%;
-  width: 18em;
+  width: 20em;
   right: auto;
   left: 0;
   position: absolute;
@@ -229,6 +229,7 @@ button {
 
 .clickable {
   cursor: pointer;
+  text-decoration: underline;
 }
 
 .icon {

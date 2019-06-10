@@ -31,6 +31,9 @@ var _ui_search;
 var _ui_search_table;
 var _ui_search_results;
 var _ui_search_showing;
+var _ui_search_selected_only;
+var _ui_search_results_row;
+var _ui_search_showing_row;
 
 // Function: Init
 // initializes the program by hooking up DOM elements with javscript callbacks as well as the canvas
@@ -66,11 +69,17 @@ function init() {
   });
 
   _ui_search = document.getElementById("search");
-  _ui_search.addEventListener("input", onSearchTextChanged);
+  _ui_search.addEventListener("input", onSearchParamsChanged);
 
   _ui_search_table = document.getElementById("search-table");
   _ui_search_results = document.getElementById("search-results");
   _ui_search_showing = document.getElementById("search-showing");
+
+  _ui_search_selected_only = document.getElementById("checkbox-search-only-selected");
+  _ui_search_selected_only.addEventListener("change", onSearchParamsChanged);
+
+  _ui_search_results_row = document.getElementById("search-results-row");
+  _ui_search_showing_row = document.getElementById("search-showing-row");
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
