@@ -191,7 +191,7 @@ th { /* Table header */
 .scroll-panel {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 640px;
+  max-height: 256px;
   position: relative;
   display: block;
 }
@@ -224,7 +224,7 @@ th { /* Table header */
 }
 
 #timeline {
-  width: 70%;
+  width: 50%;
   display: inline-block;
   margin: 0.2em;
 }

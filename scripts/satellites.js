@@ -341,7 +341,7 @@ orbitWorker.onmessage = function(m) {
         proj_position = hover_proj_line.geometry.attributes.position;
     } else {
         if (selected_satellite_objects[sat_id] == null) {
-            console.error("no receiver for orbit points");
+            // console.error("no receiver for orbit points");
             return;
         }
 
