@@ -1,4 +1,4 @@
-var SATELLITE_SIZE = 2;
+var SATELLITE_SIZE = 6;
 var ORBIT_SEGMENTS = 255;
 var KM_TO_WORLD_UNITS = 0.001;
 
@@ -168,7 +168,10 @@ function prepareSatellitePoints(sat_count) {
         },
         vertexShader: satellite_vert,
         fragmentShader: satellite_frag,
-        alphaTest: 0.9
+        // blending: THREE.AdditiveBlending, depthTest: true,
+        depthWrite: false,
+        alphaTest: 0.5, 
+        transparent: true
     } );
 
     sat_points = new THREE.Points(geometry, material);
