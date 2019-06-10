@@ -209,7 +209,10 @@ function initializeColorModeAltitude() {
 // Function: initializeColorModeDistance
 // initialization for the "distance" color mode
 function initializeColorModeDistance() {
-    _ui_color_info_table.innerHTML = buildStringFromConstantStep(0, 10000);
+    var min = 0;
+    var max = 10000;
+    var funSet = "setSelectionByDistanceRange";
+    _ui_color_info_table.innerHTML = buildStringFromConstantStep(min, max, getSatellitesByDistanceRange, funSet);
     transfer_function_base = transferDistance;
     updateSatellitesColor();
 }
@@ -331,13 +334,17 @@ function transferAltitude(sat_id) {
 //      the corresponding color
 //
 function transferDistance(sat_id) {
-    var x = sat_pos[sat_id*3];
-    var y = sat_pos[sat_id*3+1];
-    var z = sat_pos[sat_id*3+2];
-    var dis = Math.sqrt(x*x + y*y + z*z);
+    var dis = getSatDistance(sat_id);
     if (!isNaN(dis) && dis > 0) {
         return COLORS_RANGE[getIndexFromConstantStep(dis, 0, 10000)];
     } else {
         return COLOR_UNDEFINED;
     }
+}
+
+function getSatDistance(sat_id) {
+    var x = sat_pos[sat_id*3];
+    var y = sat_pos[sat_id*3+1];
+    var z = sat_pos[sat_id*3+2];
+    return Math.sqrt(x*x + y*y + z*z);
 }

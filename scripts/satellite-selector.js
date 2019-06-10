@@ -205,6 +205,25 @@ function areAllSatellitesSelected(sat_indices) {
     return true;
 }
 
+// Function: getSatellitesByDistanceRange
+//
+// Parameters:
+//      disMinIncl - the minimum distance for selection (inclusive)
+//      disMaxExcl - the maximum distance for selection (exclusive)
+//
+// Returns:
+//      a list with the indexes of the satellites that currently have a distance in the range [disMinIncl, disMaxExcl)
+function getSatellitesByDistanceRange(disMinIncl, disMaxExcl) {
+    var sats = [];
+    for (var i = 0; i < sat_data.length; i++) {
+        var dis = getSatDistance(i);
+        if (dis >= disMinIncl && dis < disMaxExcl) {
+            sats.push(i);
+        }
+    }
+    return sats;
+}
+
 // Function: getSatellitesByAltitudeRange
 //
 // Parameters:
@@ -246,6 +265,24 @@ function getSatellitesByTypes(types) {
     }
 
     return sats;
+}
+
+// Function: setSelectionByDistanceRange
+//
+// sets the satellites selection based on whether their current distance falls in a given range
+//
+// Parameters:
+//      disMinIncl - the minimum distance for selection (inclusive)
+//      disMaxExcl - the maximum distance for selection (exclusive)
+//      value      - a boolean indicating what value to set
+//
+function setSelectionByDistanceRange(disMinIncl, disMaxExcl, value) {
+    var sat_ids = getSatellitesByDistanceRange(disMinIncl, disMaxExcl);
+    if (value) {
+        addSelectedSatellites(sat_ids);
+    } else {
+        removeSelectedSatellites(sat_ids);
+    }
 }
 
 // Function: setSelectionByAltitudeRange
