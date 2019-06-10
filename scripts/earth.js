@@ -26,14 +26,10 @@ function fillSceneWithEarth(scene) {
     earth_geometry.scale(_earth_scale[0], _earth_scale[1], _earth_scale[2]); // earth is ellipsoid: https://en.wikipedia.org/wiki/Figure_of_the_Earth#Volume
     // earth_geometry.rotateY(Math.PI*0.5);
 
-    var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
     var earth_material = new THREE.MeshToonMaterial({
         map: new THREE.TextureLoader().load('./resources/earth.jpg'),
         gradientMap: new THREE.TextureLoader().load('./resources/gradient_map.png'),
-        bumpMap: earth_bump,
         bumpScale: 0.1,
-        roughnessMap: earth_bump,
-        metalnessMap: earth_bump,
     });
     earth = new THREE.Mesh(earth_geometry, earth_material);
 
@@ -62,7 +58,8 @@ function generateSelectionCone() {
         color: 0xffff00,
         opacity: 0.2,
         transparent: true,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        depthWrite: false
     } );
 
     geometry.translate(0, h * -0.5, 0);

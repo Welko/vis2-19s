@@ -8,48 +8,76 @@
 </head>
 <body>
 <div id="overlay">
-  <div id="overlay-top" class="overlay-panel">
-    <div id="branding">Satellite Tracker by Lucas and Dominik</div>
-  </div>
+
   <div id="overlay-right" class="overlay-panel">
+    <div id="credits-link" class="panel">Credits
+      <div id="credits-panel">
+        <h1>Real-Time Interactive Satellite Tracker</h1>
+        <p>
+          This application was a student project by Lucas da Cunha Melo and Dominik Scholz for the 
+          <a href="https://www.cg.tuwien.ac.at/courses/Visualisierung2/">Visualization 2</a> lecture at the <a href="https://www.tuwien.at/">TU Wien</a> in the summer term of 2019.
+          <br/><br/>
+          It is inspired by the work in <a href="http://stuffin.space/">stuffin.space</a> but uses 
+          <a href="https://threejs.org/">Threejs</a> instead of raw WebGL calls. The satellite orbits were calculates using
+          <a href="https://github.com/shashwatak/satellite-js">satellite.js</a> and for the orbit body calculation 
+          <a href="http://cosinekitty.com/astronomy.js">astronomy.js</a> was used.
+          <br/><br/>
+          We want to thank all those library creators for the amazing work they've built. We want to further credit NASA 
+          for the <a href="https://de.wikipedia.org/wiki/Datei:Nasa_land_ocean_ice_8192.jpg">texture of earth</a> and 
+          ESO/S. Brunier for the <a href="https://www.eso.org/public/images/eso0932a/">milky way panorama</a>.
+        </p>
+      </div>
+    </div>
     <div id="selection-box" class="panel">
-      Colors
-      <select id="color-select">
-        <option value="type" selected>Type</option>
-        <option value="altitude">Altitude</option>
-        <option value="distance">Distance</option>
-      </select>
+      <div class="panel-header">
+        Colors
+        <div class="panel-header-controls">
+          <select id="color-select">
+            <option value="type" selected>Type</option>
+            <option value="altitude">Altitude</option>
+            <option value="distance">Distance</option>
+          </select>
+        </div>
+      </div>
       <table id="color-info-table">
       </table>
     </div>
     <div class="panel">
-      Details
-      <div id="satellite-info-box"></div>
+      <div class="panel-header">Details</div>
+      <div id="satellite-info-box" class="scroll-panel"></div>
     </div>
   </div>
+
   <div id="overlay-left" class="overlay-panel">
+    <div class="panel">Satellite Tracker by Lucas and Dominik</div>
     <div class="panel">
-      Selection
-      <button id="button-clear-selection">Clear</button>
+      <div class="panel-header">
+        Selection
+        <div class="panel-header-controls">
+            <button id="button-clear-selection" class="menu-button">Clear</button>
+        </div>
+      </div>
       <table id="selection-table">
         <tr><td>Count</td><td id="satellites-count">0</td></tr>
       </table>
     </div>
     <div class="panel">
-      Search
-      <input id="search" type="text"/>
+      <div class="panel-header">
+        Search
+        <div class="panel-header-controls"><input id="search" type="text"/></div>
+      </div>
       <table>
         <tr><td><input id="checkbox-search-only-selected" type="checkbox" checked>Search only selected</td></tr>
         <tr id="search-results-row"><td>Results</td><td id="search-results">0</td></tr>
         <tr id="search-showing-row"><td>Showing</td><td id="search-showing">0</td></tr>
       </table>
-      <table id="search-table"></table>
+      <table id="search-table" class="scroll-panel"></table>
     </div>
   </div>
   <div id="overlay-bottom">
     <!-- <button id="pause-button"><span class="icon pause-icon paused"></span></button> -->
     <!-- <button id="stop-button"><span class="icon stop-icon"></span></button> -->
-    <button id="now-button"></button>
+    <button id="now-button" class="menu-button">Now</button>
     <div id="timeline">
       <input type="range" min="-10080" max="10080" value="0" class="slider" id="timeinput"></input>
     </div>

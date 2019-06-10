@@ -235,7 +235,7 @@ function colorFunction(sat_id) {
 //      the alpha value
 //
 function alphaFunction(sat_id) {
-    return _SAT_IDS_SELECTED[sat_id] ? 1 : 0.2;
+    return _SAT_IDS_SELECTED[sat_id] ? 1 : 0.15;
 }
 
 // Function: getIndexFromRange

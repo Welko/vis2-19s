@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400');
 
 body {
-  color: rgb(255, 255, 255);
+  color: #eee;
   font-family: 'Open Sans', sans-serif;
   text-align: center;
-  font-weight: 300;
+  font-weight: 400;
 
   background-color: black;
   margin: 0;
@@ -13,6 +13,39 @@ body {
 
 span {
   margin: 1em;
+}
+
+a:link {
+  color: white;
+}
+
+/* visited link */
+a:visited {
+  color:white;
+}
+
+/* mouse over link */
+a:hover {
+  color: rgb(39, 229, 243);
+}
+
+/* selected link */
+a:active {
+  color: gray;
+}
+
+#credits-panel {
+  display: none;
+  position: absolute;
+  background-color: #575555;
+  font-size: 14px;
+  padding: 20px;
+  left: -100%;
+  z-index: 10;
+}
+
+#credits-link:hover #credits-panel {
+  display: block;
 }
 
 #satellite-nameplate {
@@ -55,6 +88,22 @@ span {
 
 #selection-box {
   padding: 1em;
+}
+
+#search-table {
+  width: 100%;
+}
+
+#search-table button {
+  width: 4em;
+}
+
+.panel-header-controls {
+  float: right;
+}
+
+.panel-header {
+  margin-bottom: 10px;
 }
 
 .hidden {
@@ -108,6 +157,15 @@ th { /* Table header */
   height: 100%;
 }
 
+.menu.button {
+  border: 0;
+  border-radius: 0;
+  color: #a5a5a5;
+  background-color: transparent;
+  height: 100%;
+}
+
+
 .flip-button::before {
   content: "▼";
 }
@@ -125,35 +183,35 @@ th { /* Table header */
 }
 
 .panel {
-  border: 1px solid lightgray;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #5959599c;
+}
+
+.scroll-panel {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 640px;
+  position: relative;
+  display: block;
 }
 
 .overlay-panel {
-  overflow-y: auto;
-  overflow-x: hidden;
+  width: 20em;
+  position: absolute;
+  text-align: left;
+  pointer-events: none !important;
 }
 
 #overlay-right {
-  background-color: #3f3f3fc7;
-  height: 100%;
-  width: 20em;
   right: 0;
   left: auto;
-  position: absolute;
-  text-align: left;
+  
 }
 
 #overlay-left {
-  background-color: #3f3f3fc7;
-  height: 100%;
-  width: 20em;
   right: auto;
   left: 0;
-  position: absolute;
-  text-align: left;
 }
 
 #canvas {
@@ -208,15 +266,13 @@ th { /* Table header */
 }
 
 button {
-  width: 3em;
-  height: 1.3em;
-  border-radius: 0.1em;
-  font-size: 0.75em;
-  color: #202020;
-  background-color: #ccc;
-  border: 1px solid white;
-  margin: 0.1em;
-  padding: 0.1em;
+  border-radius: 2px;
+  font-size: 0.8em;
+  color: white;
+  border: 0px solid transparent;
+  background-color: #666;
+  /* margin: ; */
+  padding: 0.8em 1.2em;
   vertical-align: middle;
   
   transition: 100ms all ease;
@@ -310,19 +366,4 @@ button {
   border-style: double;
   margin-left: 0;
   border-width: 0em 0em 0em 0.81em;
-}
-
-#branding {
-  position: absolute;
-  left: 0;
-  font-size: 0.7em;
-}
-
-#fractal-choice {
-  position: absolute;
-  right: 0;
-  font-size: 0.7em;
-  background-color: transparent;
-  color: white;
-  border: none;
 }
