@@ -66,7 +66,15 @@ function loadJSON(callback, path) {
 //      scene - reference to the THREE.js scene
 //
 function startSatelliteLoading(scene) {
-    loadJSON(function(text) { getSatellites(scene, text); }, "./resources/TLE.json");
+    
+    var path;
+    
+    if (window.location.href.endsWith("live")) {
+        path = "http://stuffin.space/TLE.json?fakeparameter=to_avoid_browser_cache2"; // thx to stuffin.space <3
+    } else {
+        path = "./resources/TLE.json";
+    }
+    loadJSON(function(text) { getSatellites(scene, text); }, path);
 }
 
 // Function: getSatellites
