@@ -9,6 +9,24 @@ img {
     margin: auto;
 }
 
+.gallery img {
+    width: 48%;
+    display: inline-block;
+}
+
+.caption {
+    text-align: center;
+    width: 100%;
+    display: inline-block;
+    margin: 1em;
+}
+
+.gallery img:last-of-type {
+    float: right;
+    margin-left: 0;
+    margin-right: auto;
+}
+
 h1 {
     color: #377eb8;
     font-size: 2.2em;
