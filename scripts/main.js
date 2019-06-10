@@ -64,9 +64,10 @@ function init() {
     }, false);
 
     var button_clear_selection = document.getElementById("button-clear-selection");
-    button_clear_selection.addEventListener("click", function () {
-        clearSatelliteSelection();
-    });
+    button_clear_selection.addEventListener("click", clearSatelliteSelection);
+
+    var button_select_all = document.getElementById("button-add-all-selection");
+    button_select_all.addEventListener("click", addAllSatellites);
 
     _ui_search = document.getElementById("search");
     _ui_search.addEventListener("input", onSearchParamsChanged);

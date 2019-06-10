@@ -208,7 +208,7 @@ th { /* Table header */
 }
 
 button {
-  width: 3em;
+  /*width: 3em;*/
   height: 1.3em;
   border-radius: 0.1em;
   font-size: 0.75em;
@@ -221,6 +221,10 @@ button {
   
   transition: 100ms all ease;
   cursor: pointer;
+}
+
+input[type="number"] {
+  width: 3em;
 }
 
 .search-select-button-yes {

@@ -92,31 +92,6 @@ var COLOR_UNDEFINED = new THREE.Color(0x000000);
 var COLOR_SELECTED = new THREE.Color(0xffffff);
 var COLOR_UNSELECTED = new THREE.Color(0x444444);
 
-// Function: buildStringFromRange
-//
-// builds the string displaying the color information of numerical ranges, given the full range
-//
-// Parameters:
-//      bottom - the lowest value of the range
-//      step - the size of each bin
-//      top -  the highest value of the range
-//
-// Returns:
-//      the html table containing the color information
-//
-function buildStringFromRange(bottom, step, top) {
-    var tableInnerHtml = "";
-    var max = top;
-    top = bottom;
-    for (var i = 0; i < COLORS_RANGE.length-1; i++) { // Stops at length-1 !!! Last element is calculated separately
-        bottom = top;
-        top = bottom + step;
-        tableInnerHtml += addColorHtml(COLORS_RANGE[i], "[" + bottom + ", " + top + ")");
-    }
-    tableInnerHtml += addColorHtml(COLORS_RANGE[COLORS_RANGE.length - 1], "[" + top + ", " + max + "]");
-    return tableInnerHtml;
-}
-
 // Function: buildStringFromConstantStep
 //
 // builds the string displaying the color information of numerical ranges, given the start and step size
@@ -124,17 +99,23 @@ function buildStringFromRange(bottom, step, top) {
 // Parameters:
 //      start - the lowest value of the range
 //      step - the size of each bin
+//      funGet - the function to find the satellites that fall into a category
+//      funSet - the function name (string) to set the selection of the satellites that fall into a category WITHOUT ARGUMENTS
 //
 // Returns:
 //      the html table containing the color information
 //
-function buildStringFromConstantStep(start, step) {
+function buildStringFromConstantStep(start, step, funGet, funSet) {
     var tableInnerHtml = "";
     for (var i = 0; i < COLORS_RANGE.length; i++) {
         var min = (start + i * step) + "";
         var max = (start + ((i+1) * step)) + "";
         if (i === COLORS_RANGE.length-1) max = "Infinity";
-        tableInnerHtml += addColorHtml(COLORS_RANGE[i], "[" + min + " - " + max + ") km");
+        var count = funGet(min, max).length;
+        var fun = funSet + "(" + min + ", " + max + ", ";
+        var funSel = fun + "true)";
+        var funCle = fun + "false)";
+        tableInnerHtml += addColorHtml(COLORS_RANGE[i], "[" + min + " - " + max + ") km", count, funSel, funCle);
     }
     return tableInnerHtml;
 }
@@ -144,16 +125,30 @@ function buildStringFromConstantStep(start, step) {
 // adds a table row of one color bin to the color dispaly
 //
 // Parameters:
-//      color - the color of the bin
-//      descr - textual description of the bin
+//      color  - the color of the bin
+//      descr  - textual description of the bin
+//      count  - the number of satellites that fall into this category
+//      funSel - the name (string) of the function to be executed when the "select all" button is clicked WITH ARGUMENTS
+//      funCle - the name (string) of the function to be executed when the "clear" button is clicked WITH ARGUMENTS
 //
 // Returns:
 //      the html row containing the color bin information
 //
-function addColorHtml(color, descr) {
+function addColorHtml(color, descr, count, funSel, funCle) {
     var row = "<tr><td style='width: 5em; background-color: #" + color.getHexString() + ";'></td>";
-    row += "<td>" + descr + "</td></tr>";
+    row += "<td>" + descr + "</td>";
+    row += "<td>(" + count + ")</td>";
+    //row += "<td><input type='image' src='../resources/select.png' onclick='" + funSel + "'>+</input></td>";
+    //row += "<td><input type='image' src='../resources/unselect.png' onclick='" + funCle + "'>-</input></td>";
+    row += "<td class='clickable' onclick=\"" + funSel + "\">+</td>";
+    row += "<td class='clickable' onclick=\"" + funCle + "\">-</td>";
+    row += "</tr>";
     return row;
+}
+
+// TODO remove
+function dummy() {
+    console.log("dummy");
 }
 
 // Initialization ------------------------------------------------------------------------------------------------------
@@ -175,14 +170,23 @@ function initializeColorModeType() {
                 satTypesCache.push(type);
                 satTypesColorCache.push(color);
 
-                tableInnerHtml += addColorHtml(color, type);
+                var count = getSatellitesByTypes([type]).length;
+                var funSel = "setSelectionByTypes(['" + type + "'], " + true + ")";
+                var funCle = "setSelectionByTypes(['" + type + "'], " + false + ")";
+
+                tableInnerHtml += addColorHtml(color, type, count, funSel, funCle);
+
+                tableInnerHtml += "</tr>"
             }
         }
     } else {
         for (var i = 0; i < satTypesCache.length; i++) {
             var type = satTypesCache[i];
             var color = satTypesColorCache[i];
-            tableInnerHtml += addColorHtml(color, type);
+            var count = getSatellitesByTypes([type]).length;
+            var funSel = "setSelectionByTypes(['" + type + "'], " + true + ")";
+            var funCle = "setSelectionByTypes(['" + type + "'], " + false + ")";
+            tableInnerHtml += addColorHtml(color, type, count, funSel, funCle);
         }
     }
 
@@ -194,7 +198,10 @@ function initializeColorModeType() {
 // Function: initializeColorModeAltitude
 // initialization for the "altitude" color mode
 function initializeColorModeAltitude() {
-    _ui_color_info_table.innerHTML = buildStringFromConstantStep(0, 10000);
+    var min = 0;
+    var max = 10000;
+    var funSet = "setSelectionByAltitudeRange";
+    _ui_color_info_table.innerHTML = buildStringFromConstantStep(min, max, getSatellitesByAltitudeRange, funSet);
     transfer_function_base = transferAltitude;
     updateSatellitesColor();
 }

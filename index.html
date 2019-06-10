@@ -29,9 +29,22 @@
   </div>
   <div id="overlay-left" class="overlay-panel">
     <div class="panel">
+      Options
+      <table>
+          <tr><td><input type="checkbox" id="cb-show-planets">Show planets</input></td></tr>
+          <tr><td><input type="checkbox" id="cb-show-axes">Show axes</input></td></tr>
+          <tr><td><input type="checkbox" id="cb-texture-earth">Texture earth</input></td></tr>
+      </table>
+    </div>
+    <div class="panel">
       Selection
       <button id="button-clear-selection">Clear</button>
+      <button id="button-add-all-selection">Select all</button>
       <table id="selection-table">
+        <tr><td>Brush angle</td>
+            <td><input type="number" min="1" max="45" value="5"/></td>
+            <td><input type="range" min="1" max="45" value="5"/></td>
+        </tr>
         <tr><td>Count</td><td id="satellites-count">0</td></tr>
       </table>
     </div>
@@ -51,7 +64,7 @@
     <!-- <button id="stop-button"><span class="icon stop-icon"></span></button> -->
     <button id="now-button"></button>
     <div id="timeline">
-      <input type="range" min="-10080" max="10080" value="0" class="slider" id="timeinput"></input>
+      <input type="range" min="-10080" max="10080" value="0" class="slider" id="timeinput"/>
     </div>
   </div>
 </div>
