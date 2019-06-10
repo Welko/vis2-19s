@@ -223,6 +223,10 @@ button {
   cursor: pointer;
 }
 
+.search-select-button-yes {
+  background-color: #77bb77;
+}
+
 .icon {
   box-sizing: border-box;
   transition: 100ms all ease;

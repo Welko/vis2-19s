@@ -62,19 +62,44 @@ function setSelectedSatellites(sat_indexes, value) {
     return count;
 }
 
-function addSelectedSatellites(sat_indexes) {
+function toggleSelectedSatellites(sat_indexes, update_search=true) {
+    var add = [];
+    var remove = [];
+    for (var i = 0; i < sat_indexes.length; i++) {
+        var index = sat_indexes[i];
+        if (_SAT_IDS_SELECTED[index]) {
+            remove.push(index);
+        } else {
+            add.push(index);
+        }
+    }
+
+    addSelectedSatellites(add, false);
+    removeSelectedSatellites(remove, false);
+    if (update_search) {
+        updateSearchSelectButtons();
+    }
+}
+
+function addSelectedSatellites(sat_indexes, update_search=true) {
     var changedCount = setSelectedSatellites(sat_indexes, true);
     _SAT_IDS_SELECTED_COUNT += changedCount;
     updateSatellitesCount()
+    if (update_search) {
+        updateSearchSelectButtons();
+    }
 }
 
-function removeSelectedSatellites(sat_indexes) {
+function removeSelectedSatellites(sat_indexes, update_search=true) {
     var changedCount = setSelectedSatellites(sat_indexes, false);
     _SAT_IDS_SELECTED_COUNT -= changedCount;
     updateSatellitesCount();
+    if (update_search) {
+        updateSearchSelectButtons();
+    }
 }
 
-function clearSatelliteSelection() {
+function clearSatelliteSelection(update_search=true) {
     initializeSatelliteSelectorIfNotInitialized();
     var colorsObj = sat_points.geometry.attributes.color;
     var colors = colorsObj.array;
@@ -89,6 +114,9 @@ function clearSatelliteSelection() {
     colorsObj.needsUpdate = true;
     _SAT_IDS_SELECTED_COUNT = 0;
     updateSatellitesCount();
+    if (update_search) {
+        updateSearchSelectButtons();
+    }
 }
 
 function updateSatellitesCount() {
