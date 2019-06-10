@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("onk",["Function"],[["onKeyDown",,[[,,,,0,"File:main.js:onKeyDown"]]],["onKeyUp",,[[,,,,0,"File:main.js:onKeyUp"]]]]);

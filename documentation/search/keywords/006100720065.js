@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("are",["Function"],[["areAllSatellitesSelected",,[[,,,,0,"File:satellite-selector.js:areAllSatellitesSelected"]]]]);

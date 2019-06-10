@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("res",["Function"],[["resetSatellite",,[[,,,,0,"File:satellites.js:resetSatellite"]]]]);

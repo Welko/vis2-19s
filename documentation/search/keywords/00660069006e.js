@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("fin",["Function"],[["findSatellitesInCone",,[[,,,,0,"File:earth.js:findSatellitesInCone"]]]]);

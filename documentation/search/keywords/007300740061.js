@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("sta",["Function"],[["startSatelliteLoading",,[[,,,,0,"File:satellites.js:startSatelliteLoading"]]]]);

@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("mat",["Function"],[["matches",,[[,,,,0,"File:searcher.js:matches"]]]]);

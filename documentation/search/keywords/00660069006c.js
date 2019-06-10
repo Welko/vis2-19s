@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("fil",["Function"],[["fillScene",,[[,,,,0,"File:main.js:fillScene"]]],["fillSceneWithEarth",,[[,,,,0,"File:earth.js:fillSceneWithEarth"]]],["fillSceneWithObjects",,[[,,,,0,"File:scene-objects.js:fillSceneWithObjects"]]]]);
