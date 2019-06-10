@@ -8,6 +8,13 @@ var earth_scale;
 var KM_TO_WORLD_UNITS = 0.001;
 var ONE_OVER_KM_TO_WORLD_UNITS = 1 / KM_TO_WORLD_UNITS;
 
+// Function: onmessage
+//
+// calculates the orbit and the ground track of the requested satellite
+//
+// Parameters:
+//      m - message object, contains request data
+//
 onmessage = function(m) {
   
   if(m.data.is_init) {
@@ -73,6 +80,13 @@ onmessage = function(m) {
   }
 };
 
+// Function: projectPointOntoEarth
+//
+// projects orbit points onto earth along time dimension (orbit as earth rotates below), "ground track"
+//
+// Parameters:
+//      m - message object, contains request data
+//
 function projectPointOntoEarth(p, gmst, scale) {
 
   // transform points so length is more accurate (doesn't matter for normal)
