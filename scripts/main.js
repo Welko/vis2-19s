@@ -27,6 +27,8 @@ var _ui_renderer;
 var _ui_satellites_count;
 var _ui_color_select;
 var _ui_color_info_table;
+var _ui_options_table;
+var _ui_button_options_collapse;
 var _ui_search;
 var _ui_search_table;
 var _ui_search_results;
@@ -73,6 +75,19 @@ function init() {
 
     var button_select_all = document.getElementById("button-add-all-selection");
     button_select_all.addEventListener("click", addAllSatellites);
+
+    _ui_options_table = document.getElementById("options-table");
+
+    _ui_button_options_collapse = document.getElementById("options-collapse");
+    _ui_button_options_collapse.addEventListener("click", function() {
+        _ui_options_table.classList.toggle("hidden");
+        var hidden = _ui_options_table.classList.contains("hidden");
+        if (hidden) {
+            _ui_button_options_collapse.innerHTML = "▼";
+        } else {
+            _ui_button_options_collapse.innerHTML = "▲";
+        }
+    });
 
     _ui_search = document.getElementById("search");
     _ui_search.addEventListener("input", onSearchParamsChanged);
