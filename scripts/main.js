@@ -46,13 +46,13 @@ function init() {
 
   time_input = document.getElementById('timeinput');
 
-  time_input.oninput = update_time;
-  // time_input.onchange = update_time;
+  time_input.oninput = updateTime;
+  // time_input.onchange = updateTime;
 
   var now_button = document.getElementById("now-button");
   now_button.addEventListener("click", function () {
     time_input.value = 0;
-    update_time();
+    updateTime();
   });
 
   _ui_color_select = document.getElementById('color-select');
