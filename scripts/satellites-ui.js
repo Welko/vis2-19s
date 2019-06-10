@@ -59,8 +59,6 @@ function addSatelliteToList(sat_id) {
         div += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
         div += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
         div += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
-        div += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-        div += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
 
         div += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
         div += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";

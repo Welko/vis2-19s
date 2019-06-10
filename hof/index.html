@@ -30,7 +30,7 @@
     <h2>Overview</h2>
 
     <p>
-        Satellite data comes in the form of a Two-Line Element (TLE) set (<a href="#">Figure 1</a>), a format that describe
+        Satellite data comes in the form of a Two-Line Element (TLE) set (<a href="#fig1">Figure 1</a>), a format that describe
         a satellite's orbital elements.
 
         TLE can be used to find a satellite's position in space, but it is highly non-human-readable.
@@ -48,6 +48,11 @@
         Using techniques such as brushing, dynamic queries and details on demand, this application enables users to
         visualize only the satellites they are interested in. <span class="todo">Sounds bad. Elaborate</span>
     </p>
+
+    <div class="gallery" id="fig1">
+
+        <div class="caption">Figure 1: A Two-Line Element set. <span class="todo">Elaborate, add image</span> </div>
+    </div>
 
     <h2>Features</h2>
     <p>
@@ -89,8 +94,22 @@
 
         This selection is visualized in the form of a cone, as shown in <a href="#">Figure 2</a>.
 
-        With this tool, users can brush over a region on earth (countries, continents) and find all satellites currently
+        With this tool, users can brush over a region on earth (e.g., countries or continents) and find all satellites currently
         over the defined area.
+    </p>
+
+    <h3>Details on demand</h3>
+    <p>
+        A TLE set provides information about a satellite's position at a given point in time, but it also provides
+        multiple other values, such as inclination, eccentricity, apogee, etc.
+
+        These details can be of interest to some exploration cases, but cannot be display at once for each of the (over)
+        17.000 satellites.
+
+        For those reasons, RTIST provides these details only for a specified set of satellites.
+
+        By clicking on a 3D point or on the name of a satellite on a search result, all details about that satellite are
+        displayed in a list.
     </p>
 
     <div class="doublegallery">
@@ -100,12 +119,34 @@
     </div>
 
     <h3>Search</h3>
-    <p>Blablabla</p>
+    <p>
+        Simply plotting tridimensional points around the earth and providing details on demand is not enough to provide
+        an overview of the data and enable an effective exploration: filtering the data to find specific entries is
+        fundamental for the insight gaining process.
+
+        In the RTIST tool, using a text box, the user is able to perform dynamic queries.
+
+        The input text is used to search for <em>name</em> and <em>type</em> matches.
+
+        Search terms must be separated by a whitespace and satellites matching terms starting with a backslash will be
+        excluded from the result.
+    </p>
 
     <h3>Color</h3>
     <p>
+        By coloring the 3D points based on their attributes, it is possible to visually distinguish them from each
+        other, providing further insights.
 
-        <a href="http://colorbrewer2.org/">ColorBrewer</a>
+        In RTIST, satellites can be colored based on their type (categorical), altitude (numerical, distance from the surface of the earth) and
+        distance (numerical, distance from the center of the earth).
+
+        The colors for the different classes were selected from <a href="http://colorbrewer2.org/">ColorBrewer</a>, a
+        tool for guidance in using color schemes, based on the research of Dr. Cynthia Brewer.
+    </p>
+
+    <h3>Planets</h3>
+    <p>
+
     </p>
 
     <div class="doublegallery">
@@ -123,5 +164,6 @@
     <h3>Details on demand</h3>
     <p>Blablabla</p>
 </div>
+
 </body>
 </html>
