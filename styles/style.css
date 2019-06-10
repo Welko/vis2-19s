@@ -227,6 +227,10 @@ button {
   background-color: #77bb77;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .icon {
   box-sizing: border-box;
   transition: 100ms all ease;

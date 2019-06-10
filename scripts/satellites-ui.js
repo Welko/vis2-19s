@@ -8,37 +8,46 @@ function addSatelliteToList(sat_id) {
     var data = sat_data[selected_satellite_id];
     var extra = sat_extra[selected_satellite_id];
 
-    var sat_info = "<div id='info-" + selected_satellite_id + "' class='satellite-info";
-    sat_info += "'>";
-    sat_info += "<h1>" + sat_data[selected_satellite_id].name + "</h1>";
-    sat_info += "<div class='info-buttons'>";
-    sat_info += "<button class='flip-button' onclick='flipInfo(" + selected_satellite_id + ")'></button>";
-    sat_info += "<button class='remove-button' onclick='removeInfo(" + selected_satellite_id + ")'></button>";
-    sat_info += "</div><table>";
+    var sat_info = document.createElement("div");
+    sat_info.setAttribute("id", "info-" + selected_satellite_id);
+    sat_info.classList.add("satellite-info");
 
-        sat_info += "<tr><td>Type</td><td>" + data.type + "</td></tr>";
+    var h1 = document.createElement("h1");
+    h1.innerHTML = sat_data[selected_satellite_id].name;
+    h1.classList.add("clickable");
+    h1.setAttribute("onclick", "onSelectedSatelliteNameClicked(" + selected_satellite_id + ")");
+    sat_info.appendChild(h1);
 
-        sat_info += "<tr><td>Latitude</td><td id='lat-"+selected_satellite_id+"'></td></tr>";
-        sat_info += "<tr><td>Longitude</td><td id='lon-"+selected_satellite_id+"'></td></tr>";
-        sat_info += "<tr><td>Altitude</td><td id='alt-"+selected_satellite_id+"'></td></tr>";
+    var div = "<div class='info-buttons'>";
+    div += "<button class='flip-button' onclick='flipInfo(" + selected_satellite_id + ")'></button>";
+    div += "<button class='remove-button' onclick='removeInfo(" + selected_satellite_id + ")'></button>";
+    div += "</div><table>";
 
-        sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-        sat_info += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
-        sat_info += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
-        sat_info += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
-        sat_info += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
-        sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
-        sat_info += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+        div += "<tr><td>Type</td><td>" + data.type + "</td></tr>";
 
-        sat_info += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
-        sat_info += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";
-        sat_info += "<tr><td>Apogee</td><td>" + extra.apogee + "</td></tr>";
-        sat_info += "<tr><td>Perigee</td><td>" + extra.perigee + "</td></tr>";
-        sat_info += "<tr><td>Period</td><td>" + extra.period + "</td></tr>";
+        div += "<tr><td>Latitude</td><td id='lat-"+selected_satellite_id+"'></td></tr>";
+        div += "<tr><td>Longitude</td><td id='lon-"+selected_satellite_id+"'></td></tr>";
+        div += "<tr><td>Altitude</td><td id='alt-"+selected_satellite_id+"'></td></tr>";
 
-    sat_info += "</table></div>";
+        div += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+        div += "<tr><td>Eccentricity</td><td>" + extra.eccentricity + "</td></tr>";
+        div += "<tr><td>Raan</td><td>" + extra.raan + "</td></tr>";
+        div += "<tr><td>AargPe</td><td>" + extra.argPe + "</td></tr>";
+        div += "<tr><td>Mean Motion</td><td>" + extra.meanMotion + "</td></tr>";
+        div += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
+        div += "<tr><td>Inclination</td><td>" + extra.inclination + "</td></tr>";
 
-    satellite_info_box.innerHTML += sat_info;
+        div += "<tr><td>Semi Major Axis</td><td>" + extra.semiMajorAxis + "</td></tr>";
+        div += "<tr><td>Semi Minor Axis</td><td>" + extra.semiMinorAxis + "</td></tr>";
+        div += "<tr><td>Apogee</td><td>" + extra.apogee + "</td></tr>";
+        div += "<tr><td>Perigee</td><td>" + extra.perigee + "</td></tr>";
+        div += "<tr><td>Period</td><td>" + extra.period + "</td></tr>";
+
+    div += "</table></div>";
+
+    sat_info.innerHTML += div;
+
+    satellite_info_box.appendChild(sat_info);
 
     selected_satellites_ids.push(intersected_satellite);
     selected_satellites_uis.push(document.getElementById("info-" + selected_satellite_id));
@@ -84,4 +93,8 @@ function updateSatelliteUi(index) {
     lat.innerHTML = sat_geo[index*3];
     lon.innerHTML = sat_geo[index*3 + 1];
     alt.innerHTML = sat_geo[index*3 + 2];
+}
+
+function onSelectedSatelliteNameClicked(sat_id) {
+    search(sat_data[sat_id].name);
 }
