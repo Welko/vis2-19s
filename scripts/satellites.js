@@ -407,6 +407,8 @@ function unhighlightSatellites() {
 //      raycaster - THREE.js raycaster object of the scene
 //      container - DOM element handle for changing the cursor
 //
+// 
+//
 function intersectSatellites(raycaster, container) {
     if (!finished_loading) return false;
 
