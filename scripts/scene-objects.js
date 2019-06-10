@@ -6,6 +6,18 @@ var equatorial_to_ecliptic;
 
 var sun_light;
 
+// Function: createSceneBody
+//
+// creates a "scene body", this is the THREE.js buffer representation of an orbital body like the moon, the sun or planets
+//
+// Parameters:
+//      radius - radius of the body (used in x and z direction)
+//      height - radius of the body along the y direction (used for making oblate spheroids)
+//      color - color of this body
+//
+// Returns:
+//      the THREE.js buffer representation of this orbital body
+//
 function createSceneBody(radius, height, color) {
     var body_geometry = new THREE.SphereGeometry(1, 48, 24);
     body_geometry.scale(radius, height, radius); // https://en.wikipedia.org/wiki/Moon
@@ -27,6 +39,17 @@ function createSceneBody(radius, height, color) {
     return group;
 }
 
+// Function: createBody
+//
+// creates a "body", this is the representation of an orbital body like the moon, the sun or planets
+// as its geocentric orbit and its physical form (sphere)
+//
+// Parameters:
+//      astronomy_body - reference to the astronomy.js instance of this body
+//      radius - radius of the body (used in x and z direction)
+//      height - radius of the body along the y direction (used for making oblate spheroids)
+//      color - color of this body
+//
 function createBody(astronomy_body, radius, height, color) {
     var scene_body = createSceneBody(radius, height, color);
     scene.add(scene_body);
@@ -34,6 +57,13 @@ function createBody(astronomy_body, radius, height, color) {
     bodies.push({ astronomy_body: astronomy_body, scene_object: scene_body });
 }
 
+// Function: fillSceneWithObjects
+//
+// fills the scene with all objects other than satellites
+//
+// Parameters:
+//      scene - the THREE.js scene object
+//
 function fillSceneWithObjects(scene) {
     // grid
     var grid = new THREE.GridHelper(1000, 10, 0x666666, 0x333333);
@@ -96,6 +126,14 @@ function fillSceneWithObjects(scene) {
     scene.background = textureCube;
 }
 
+// Function: updateSceneObjects
+//
+// updates scene objects that have to be updated every frame
+// gets called every frame in the rendering loop!
+//
+// Parameters:
+//      delta - passed delta time since last frame in seconds
+//
 function updateSceneObjects(delta) {
     updateEarth(delta);
 }
@@ -104,6 +142,15 @@ var AU_TO_KM = 149597870.7;
 var KM_TO_WORLD_UNITS = 0.001;
 var AU_TO_WORLD_UNITS = 149597.8707;
 
+// Function: addBodyOrbit
+//
+// creates the THREE.js representation of the given orbital body's orbit
+//
+// Parameters:
+//      scene - the THREE.js scene object
+//      body - reference to the astronomy.js instance of this body
+//      color - color of this body
+//
 function addBodyOrbit(scene, body, color) {
     var orbit = sample_orbit.clone();
     orbit.material.color = new THREE.Color(color);
@@ -122,7 +169,7 @@ function addBodyOrbit(scene, body, color) {
         var c = body.GeocentricCoordinates(day + segment); //https://en.wikipedia.org/wiki/Astronomical_unit
         var coordinates = new THREE.Vector3(c.x, c.y, c.z);
         coordinates.multiplyScalar(AU_TO_WORLD_UNITS);
-        coordinates = EquatorialToEclipticPlane(coordinates);
+        coordinates = equatorialToEclipticPlane(coordinates);
 
         positions[i*3] = coordinates.x;
         positions[i*3+1] = coordinates.z; // y and z flipped
@@ -139,20 +186,37 @@ function addBodyOrbit(scene, body, color) {
     scene.add(orbit);
 }
 
-function EquatorialToEclipticPlane(coordinates) {
+// Function: equatorialToEclipticPlane
+//
+// transforms equatorial to ecliptic plane coordinates
+//
+// Parameters:
+//      coordinates - the input coordinate in the quatorial coordinate system
+//
+// Returns:
+//      the transformed coordinates in the ecliptic coordinate system
+//
+function equatorialToEclipticPlane(coordinates) {
     var cor = coordinates.applyMatrix3(equatorial_to_ecliptic);
     return cor;
 }
 
+// Function: updateSceneObjectDateRelevantInfos
+// updates the date dependent code for the scene objects
 function updateSceneObjectDateRelevantInfos() {
     astronomyCalculation();
 }
 
+// Function: continuousAstronomyCalculation
+// continously updates the position of the orbital bodies
+// updates about every second
 function continuousAstronomyCalculation() {
     astronomyCalculation();
     setTimeout(astronomyCalculation, 1000);
 }
 
+// Function: astronomyCalculation
+// updates the position of the orbital bodies
 function astronomyCalculation() {
     
     var day = Astronomy.DayValue(_datetime);
@@ -162,7 +226,7 @@ function astronomyCalculation() {
         var c = body.GeocentricCoordinates(day); //https://en.wikipedia.org/wiki/Astronomical_unit
         var coordinates = new THREE.Vector3(c.x, c.y, c.z);
         coordinates.multiplyScalar(AU_TO_WORLD_UNITS);
-        coordinates = EquatorialToEclipticPlane(coordinates);
+        coordinates = equatorialToEclipticPlane(coordinates);
 
         var scene_object_pos = bodies[i].scene_object.position;
         scene_object_pos.x = coordinates.x;

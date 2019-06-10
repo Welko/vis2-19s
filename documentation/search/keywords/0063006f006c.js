@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("col",["Function"],[["colorFunction",,[[,,,,0,"File:color.js:colorFunction"]]]]);

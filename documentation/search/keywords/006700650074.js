@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("get",["Function"],[["getSatellites",,[[,,,,0,"File:satellites.js:getSatellites"]]]]);
+NDSearch.OnPrefixDataLoaded("get",["Function"],[["getIndexFromConstantStep",,[[,,,,0,"File:color.js:getIndexFromConstantStep"]]],["getIndexFromRange",,[[,,,,0,"File:color.js:getIndexFromRange"]]],["getSatellites",,[[,,,,0,"File:satellites.js:getSatellites"]]],["getSelectedColorModeFromUi",,[[,,,,0,"File:color.js:getSelectedColorModeFromUi"]]]]);

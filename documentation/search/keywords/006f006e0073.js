@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("ons",["Function"],[["onSearchParamsChanged",,[[,,,,0,"File:searcher.js:onSearchParamsChanged"]]],["onSelectedSatelliteNameClicked",,[[,,,,0,"File:satellites-ui.js:onSelectedSatelliteNameClicked"]]]]);

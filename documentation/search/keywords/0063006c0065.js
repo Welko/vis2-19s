@@ -1,0 +1,1 @@
+NDSearch.OnPrefixDataLoaded("cle",["Function"],[["clearSatelliteSelections",,[[,,,,0,"File:satellite-selector.js:clearSatelliteSelections"]]]]);

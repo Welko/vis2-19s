@@ -4,11 +4,20 @@ var _ui_search_buttons = [];
 var search_results_ids = [];
 var search_results_showing = 0;
 
+// Function: onSearchParamsChanged
+// executes a new search when the search field is changed
 function onSearchParamsChanged() {
     var text = _ui_search.value;
     search(text);
 }
 
+// Function: search
+//
+// searches through all satellites by the given string
+//
+// Parameters:
+//      string - the search string
+//
 function search(string) {
     _ui_search.value = string;
     if (string.length === 0) {
@@ -100,15 +109,31 @@ function search(string) {
     _ui_search_showing.innerHTML = showing;
 }
 
+// Function: onTableNameClicked
+//
+// executed when table name is clicked, adds satellite to the details list
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
 function onTableNameClicked(sat_id) {
     addSatelliteToList(sat_id);
 }
 
+// Function: onTableNameClicked
+//
+// executed when button at the end of the table row is clicked, adds satellite to selection
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
 function onTableSelectButtonClicked(sat_id) {
     toggleSelectedSatellites([sat_id]);
     //addSatelliteToList(sat_id);
 }
 
+// Function: onTableSelectAllClicked
+// executed when button at the top of the "selected"-column is clicked, adds all satellites of the search list to the selection
 function onTableSelectAllClicked() {
     if (areAllSatellitesSelected(search_results_ids)) {
         removeSelectedSatellites(search_results_ids);
@@ -118,6 +143,8 @@ function onTableSelectAllClicked() {
     //addSatellitesToList(search_results_ids);
 }
 
+// Function: updateSearchSelectButtons
+// updates all search select buttons
 function updateSearchSelectButtons() {
     for (var i = 0; i < search_results_ids.length; i++) {
         var index = search_results_ids[i];
@@ -125,7 +152,14 @@ function updateSearchSelectButtons() {
     }
 }
 
-// Value is 'true' or 'false'
+// Function: updateSearchSelectButton
+//
+// updates the given search select button
+//
+// Parameters:
+//      button - the button for which the text should be changed
+//      selected - boolean, wether "yes" or "no" should be displayed
+//
 function updateSearchSelectButton(button, selected) {
     var yesNo;
     if (selected) {
@@ -139,13 +173,35 @@ function updateSearchSelectButton(button, selected) {
 
 }
 
+// Function: matches
+//
+// decides whether the given data matches
+//
+// Parameters:
+//      data - data of the satellite to be matched against
+//      incl - text which should be contained in data
+//      lack - text which should be excluded in data
+//
+// Returns:
+//      boolean, whether the given data matches
+//
 function matches(data, incl, lack) {
     var name = data.name.toUpperCase();
     var type = data.type.toUpperCase();
     return includesAll([name, type], incl) && lacksAll(name, lack) && lacksAll(type, lack);
 }
 
-// String 'a' includes all strings in array 'b'
+// Function: includesAll
+//
+// checks if all strings of array b are included in array a
+//
+// Parameters:
+//      a - first string array
+//      b - second string array
+//
+// Returns:
+//      boolean, whether a includes all strings in array b
+//
 function includesAll(a, b) {
     var inclCount = 0;
     for (var i = 0; i < b.length; i++) {
@@ -159,7 +215,17 @@ function includesAll(a, b) {
     return inclCount === b.length;
 }
 
-// String 'a' includes no string in array 'b'
+// Function: includesAll
+//
+// checks if no strings of array b are included in array a
+//
+// Parameters:
+//      a - first string array
+//      b - second string array
+//
+// Returns:
+//      boolean, whether a includes no strings in array b
+//
 function lacksAll(a, b) {
     for (var i = 0; i < b.length; i++) {
         if (a.includes(b[i])) {
@@ -169,6 +235,8 @@ function lacksAll(a, b) {
     return true;
 }
 
+// Function: initializeSearcher
+// initializes the search window
 function initializeSearcher() {
     onSearchParamsChanged();
 }

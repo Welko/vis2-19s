@@ -11,6 +11,13 @@ var satellites_in_cone;
 var _SELECTION_CONE_COLOR_ADD = new THREE.Color(0x44ff44);
 var _SELECTION_CONE_COLOR_REM = new THREE.Color(0xff4444);
 
+// Function: fillSceneWithEarth
+//
+// fills the scene with earth 🌍
+//
+// Parameters:
+//      scene - the THREE.js scene object
+//
 function fillSceneWithEarth(scene) {
     var earth_geometry = new THREE.SphereGeometry( 1, 48, 24 );
     // _earth_scale = [6.378137, 6.356752, 6.378137];
@@ -38,6 +45,8 @@ function fillSceneWithEarth(scene) {
     generateSelectionCone();
 }
 
+// Function: generateSelectionCone
+// generates the brush selection cone
 function generateSelectionCone() {
     var h = 10000000;
     var r_ratio = 0.1; // find correct value!
@@ -62,6 +71,16 @@ function generateSelectionCone() {
     selection_cone = new THREE.Mesh(geometry, material);
 }
 
+// Function: intersectEarth
+//
+// intersects the earth using the given raycaster, used for deciding the brush position, called in <render>
+//
+// Parameters:
+//      raycaster - THREE.js raycaster object of the scene
+//
+// Returns:
+//      reference to the earth if it got hit, otherwise null
+//
 function intersectEarth(raycaster) {
     if (earth == null) {
         return null;
@@ -76,6 +95,13 @@ function intersectEarth(raycaster) {
     }
 }
 
+// Function: intersectEarth
+//
+// positions the brush cone, called from <render>
+//
+// Parameters:
+//      p - the position of the intersection
+//
 function positionCone(p) {
     cone_lookAt_point_normalized = p;
     cone_lookAt_point_normalized.normalize();
@@ -84,17 +110,32 @@ function positionCone(p) {
     scene.add(selection_cone);
 }
 
-
+// Function: updateEarth
+//
+// updates the rotation of the earth according to the current time
+// gets called every frame in the rendering loop!
+//
+// Parameters:
+//      delta - passed delta time since last frame in seconds
+//
 function updateEarth(delta) {
     var gmst = satellite.gstime(_datetime);
     earth.setRotationFromAxisAngle(new THREE.Vector3(0,1,0), gmst);
 }
 
+// Function: removeCone
+// removes the selection cone from the scene
 function removeCone() {
     scene.remove(selection_cone);
 }
 
-// Returns a sorted list with the indexes of all satellites that are inside the cone
+// Function: findSatellitesInCone
+// 
+// calculates which satellites are insise the selection cone
+//
+// Returns:
+//  	a sorted list with the indexes of all satellites that are inside the cone
+//
 function findSatellitesInCone() {
     if (cone_angle <= 0 || cone_lookAt_point_normalized == null) return [];
 
@@ -117,6 +158,13 @@ function findSatellitesInCone() {
     return sat_indexes;
 }
 
+// Function: setSelectionConeFunctionToAdd
+// 
+// calculates which satellites are insise the selection cone
+//
+// Parameters:
+//  	add - boolean, decides if satellites inside the cone should be added or removed from the selection
+//
 function setSelectionConeFunctionToAdd(add) {
     if (selection_cone == null) return;
     selection_cone.material.color = add ? _SELECTION_CONE_COLOR_ADD : _SELECTION_CONE_COLOR_REM;

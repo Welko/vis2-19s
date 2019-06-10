@@ -1,6 +1,8 @@
 var _SAT_IDS_SELECTED_COUNT = 0;
 var _SAT_IDS_SELECTED = [];
 
+// Function: initializeSatelliteSelectorIfNotInitialized
+// checks if the satellite selector is initialized and initializes it if it is not the case
 function initializeSatelliteSelectorIfNotInitialized() {
     if (sat_pos == null) return;
 
@@ -14,8 +16,18 @@ function initializeSatelliteSelectorIfNotInitialized() {
     }
 }
 
-// Returns the number of satellites that changed state
-function setSelectedSatellites(sat_indexes, value) {
+// Function: setSelectedSatellites
+//
+// sets the selection of the given satellites to the given value, calculates the number of satellites that changed state
+//
+// Parameters:
+//      sat_indices - array of satellite indices
+//      value - boolean, the new value
+//
+// Returns:
+//      the number of satellites that changed state
+//
+function setSelectedSatellites(sat_indices, value) {
     initializeSatelliteSelectorIfNotInitialized();
 
     //_SAT_IDS_SELECTED = mergeSorted(_SAT_IDS_SELECTED, sat_ids_sorted);
@@ -33,8 +45,8 @@ function setSelectedSatellites(sat_indexes, value) {
         }
     }
 
-    for (var i = 0; i < sat_indexes.length; i++) {
-        var index = sat_indexes[i];
+    for (var i = 0; i < sat_indices.length; i++) {
+        var index = sat_indices[i];
         var old = _SAT_IDS_SELECTED[index];
 
         if (old !== value) {
@@ -62,6 +74,14 @@ function setSelectedSatellites(sat_indexes, value) {
     return count;
 }
 
+// Function: setAllSatellites
+//
+// sets all satellites to the given value
+//
+// Parameters:
+//      value - boolean, the value all satellites will be set to 
+//      update_search - default: true, whether the search should be updated
+//
 function setAllSatellites(value, update_search=true) {
     var all = new Array(_SAT_IDS_SELECTED.length);;
     for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
@@ -75,19 +95,31 @@ function setAllSatellites(value, update_search=true) {
     }
 }
 
+// Function: addAllSatellites
+// adds all satellites to the selection
 function addAllSatellites() {
     setAllSatellites(true);
 }
 
+// Function: removeAllSatellites
+// removes all satellites from the selection
 function removeAllSatellites() {
     removeAllSatellites(false);
 }
 
-function toggleSelectedSatellites(sat_indexes, update_search=true) {
+// Function: toggleSelectedSatellites
+//
+// toggles the selection of the given satellites
+//
+// Parameters:
+//      sat_indices - array of satellite indices
+//      update_search - default: true, whether the search should be updated
+//
+function toggleSelectedSatellites(sat_indices, update_search=true) {
     var add = [];
     var remove = [];
-    for (var i = 0; i < sat_indexes.length; i++) {
-        var index = sat_indexes[i];
+    for (var i = 0; i < sat_indices.length; i++) {
+        var index = sat_indices[i];
         if (_SAT_IDS_SELECTED[index]) {
             remove.push(index);
         } else {
@@ -102,8 +134,16 @@ function toggleSelectedSatellites(sat_indexes, update_search=true) {
     }
 }
 
-function addSelectedSatellites(sat_indexes, update_search=true) {
-    var changedCount = setSelectedSatellites(sat_indexes, true);
+// Function: addSelectedSatellites
+//
+// adds the given satellites to the selection
+//
+// Parameters:
+//      sat_indices - array of satellite indices
+//      update_search - default: true, whether the search should be updated
+//
+function addSelectedSatellites(sat_indices, update_search=true) {
+    var changedCount = setSelectedSatellites(sat_indices, true);
     _SAT_IDS_SELECTED_COUNT += changedCount;
     updateSatellitesCount()
     if (update_search) {
@@ -111,8 +151,16 @@ function addSelectedSatellites(sat_indexes, update_search=true) {
     }
 }
 
-function removeSelectedSatellites(sat_indexes, update_search=true) {
-    var changedCount = setSelectedSatellites(sat_indexes, false);
+// Function: removeSelectedSatellites
+//
+// removes the given satellites from the selection
+//
+// Parameters:
+//      sat_indices - array of satellite indices
+//      update_search - default: true, whether the search should be updated
+//
+function removeSelectedSatellites(sat_indices, update_search=true) {
+    var changedCount = setSelectedSatellites(sat_indices, false);
     _SAT_IDS_SELECTED_COUNT -= changedCount;
     updateSatellitesCount();
     if (update_search) {
@@ -120,6 +168,13 @@ function removeSelectedSatellites(sat_indexes, update_search=true) {
     }
 }
 
+// Function: clearSatelliteSelections
+//
+// clears the satellite selection
+//
+// Parameters:
+//      update_search - default: true, whether the search should be updated
+//
 function clearSatelliteSelection(update_search=true) {
     initializeSatelliteSelectorIfNotInitialized();
     var colorsObj = sat_points.geometry.attributes.color;
@@ -140,13 +195,25 @@ function clearSatelliteSelection(update_search=true) {
     }
 }
 
+// Function: updateSatellitesCount
+// updates the displayed number of selected satellites
 function updateSatellitesCount() {
     _ui_satellites_count.innerHTML = _SAT_IDS_SELECTED_COUNT;
 }
 
-function areAllSatellitesSelected(sat_indexes) {
-    for (var i = 0; i < sat_indexes.length; i++) {
-        var index = sat_indexes[i];
+// Function: areAllSatellitesSelected
+//
+// checks if all given satellites are selected
+//
+// Parameters:
+//      sat_indices - array of satellite indices
+//
+// Returns:
+//      boolean, whether all given satellites are selected
+//
+function areAllSatellitesSelected(sat_indices) {
+    for (var i = 0; i < sat_indices.length; i++) {
+        var index = sat_indices[i];
         if (!_SAT_IDS_SELECTED[index]) {
             return false;
         }
@@ -154,9 +221,17 @@ function areAllSatellitesSelected(sat_indexes) {
     return true;
 }
 
-// Input: a1: a sorted array with no repeating elements
-//        a2: a sorted array with no repeating elements
-// Output: one sorted array, the union of a1 and a2 (=> common elements are discarded!)
+// Function: mergeSorted
+//
+// merges two sorted arrays so that the merged array only includes common elements once (union)
+//
+// Parameters:
+//      a1 - a sorted array with no repeating elements
+//      a2 - a sorted array with no repeating elements
+//
+// Returns:
+//      an array which is the union of the two given arrays
+//
 function mergeSorted(a1, a2) {
     var out = [];
     var i = 0;

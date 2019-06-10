@@ -23,6 +23,7 @@ var type_colors = null;
 
 var hover_orbit_line;
 var hover_proj_line;
+var empty_hover_buffers = {};
 var position_projection_line;
 var satellite_transform;
 
@@ -193,7 +194,8 @@ function prepareOrbitBuffers() {
     for (var i = 0; i < ORBIT_SEGMENTS; i++) in_progress[i] = false; // fill with false
     
     var geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array((ORBIT_SEGMENTS+1)*3), 3).setDynamic(true));
+    empty_hover_buffers.orbit_buffer = new Float32Array((ORBIT_SEGMENTS+1)*3);
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(empty_hover_buffers.orbit_buffer, 3).setDynamic(true));
 
     var material = new THREE.LineBasicMaterial({
         color: 0xffffff,
@@ -209,7 +211,8 @@ function prepareOrbitBuffers() {
 
 
     geometry = new THREE.BufferGeometry();
-    geometry.addAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(2*3), 3).setDynamic(true));
+    empty_hover_buffers.position_line_buffer = new Float32Array(2*3);
+    geometry.addAttribute('position', new THREE.Float32BufferAttribute(empty_hover_buffers.position_line_buffer, 3).setDynamic(true));
 
     material = new THREE.LineBasicMaterial({
         color: 0xffffff,
@@ -393,12 +396,24 @@ function highlightSatellite(sat_id, sizes) {
 // unhighlights - for the lack of a better word - a satellite, that is the satellite that was previously under the cursor is under it no more
 //
 // Parameters:
-//      sat_id - the id of the satellite which is no going to be amongst the stars✨
+//      sat_id - the id of the satellite which is now going to be amongst the stars ✨
 //      sizes - THREE.js buffer for updating the satellites size
 //
 function unhighlightSatellites() {
     satellite_nameplate.innerHTML = "";
     satellite_nameplate.style.display = "none";
+
+    var position = hover_orbit_line.geometry.attributes.position;
+    position.copyArray(empty_hover_buffers.orbit_buffer);
+    position.needsUpdate = true;
+    
+    position = hover_proj_line.geometry.attributes.position;
+    position.copyArray(empty_hover_buffers.orbit_buffer);
+    position.needsUpdate = true;
+
+    position = position_projection_line.geometry.attributes.position;
+    position.copyArray(empty_hover_buffers.position_line_buffer);
+    position.needsUpdate = true;
 }
 
 // Function: intersectSatellites
@@ -409,7 +424,8 @@ function unhighlightSatellites() {
 //      raycaster - THREE.js raycaster object of the scene
 //      container - DOM element handle for changing the cursor
 //
-// 
+// Returns:
+//      a boolean indicating whether the ray hit something
 //
 function intersectSatellites(raycaster, container) {
     if (!finished_loading) return false;
@@ -484,5 +500,4 @@ function removeSatellite(sat_id) {
     orbit_selection_group.remove(selected_satellite_objects[sat_id].proj);
 
     selected_satellite_objects[sat_id] = null;
-
 }

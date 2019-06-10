@@ -1,1 +1,1 @@
-NDSearch.OnPrefixDataLoaded("int",["Function"],[["intersectSatellites",,[[,,,,0,"File:satellites.js:intersectSatellites"]]]]);
+NDSearch.OnPrefixDataLoaded("int",["Function"],[["intersectEarth",,[[,,,,0,"File:earth.js:intersectEarth"]]],["intersectSatellites",,[[,,,,0,"File:satellites.js:intersectSatellites"]]]]);

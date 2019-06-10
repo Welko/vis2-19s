@@ -2,13 +2,26 @@ var selected_satellite_id = null;
 var selected_satellites_uis = [];
 var selected_satellites_ids = [];
 
+// Function: addSatellitesToList
+//
+// adds the given satellites to the details list
+//
+// Parameters:
+//      sat_ids - array of satellite ids describing the satellites, which should be added to the detail list
+//
 function addSatellitesToList(sat_ids) {
     for (var i = 0; i < sat_ids.length; i++) {
         addSatelliteToList(sat_ids[i]);
     }
 }
 
-// Satellite added to list and its extra information
+// Function: addSatelliteToList
+//
+// adds the given satellite to the details list
+//
+// Parameters:
+//      sat_id - the id of the satellite which should be added to the detail list
+//
 function addSatelliteToList(sat_id) {
 
     if (detailsListContainsSatellide(sat_id)) {
@@ -69,10 +82,24 @@ function addSatelliteToList(sat_id) {
     }
 }
 
+// Function: flipInfo
+//
+// toggles the "extended" detail info section in the UI for the given satellite
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
 function flipInfo(sat_id) {
     document.getElementById("info-" + sat_id).classList.toggle("full");
 }
 
+// Function: removeInfo
+//
+// removes the given satellite from the details list
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
 function removeInfo(sat_id) {
     removeSatellite(sat_id);
 
@@ -84,31 +111,57 @@ function removeInfo(sat_id) {
     reme.parentElement.removeChild(reme);
 }
 
+// Function: updateSatellitesUi
+// updates the information of the details list
 function updateSatellitesUi() {
     for (var i = 0; i < selected_satellites_ids.length; i++) {
         updateSatelliteUi(i);
     }
 }
 
+// Function: detailsListContainsSatellide
+//
+// checks whether the given satellite is displayed in the details list
+//
+// Parameters:
+//      sat_id - the id of the satellite
+// 
+// Returns:
+//      boolean, whether the satellite is part of the list
+//
 function detailsListContainsSatellide(sat_id) {
     return document.getElementById("info-" + sat_id) != null;
 }
 
-function updateSatelliteUi(index) {
-    var id = selected_satellites_ids[index];
+// Function: updateSatelliteUi
+//
+// updates the satellite UI for the given satellite
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
+function updateSatelliteUi(sat_id) {
+    var id = selected_satellites_ids[sat_id];
     var lat = document.getElementById("lat-" + id);
     var lon = document.getElementById("lon-" + id);
     var alt = document.getElementById("alt-" + id);
 
-    var a = sat_geo[index*3];
-    var b = sat_geo[index*3 + 1];
-    var c = sat_geo[index*3 + 2];
+    var a = sat_geo[sat_id*3];
+    var b = sat_geo[sat_id*3 + 1];
+    var c = sat_geo[sat_id*3 + 2];
 
-    lat.innerHTML = sat_geo[index*3];
-    lon.innerHTML = sat_geo[index*3 + 1];
-    alt.innerHTML = sat_geo[index*3 + 2];
+    lat.innerHTML = sat_geo[sat_id*3];
+    lon.innerHTML = sat_geo[sat_id*3 + 1];
+    alt.innerHTML = sat_geo[sat_id*3 + 2];
 }
 
+// Function: onSelectedSatelliteNameClicked
+//
+// searches in the search field after satellites with the same name <search>
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
 function onSelectedSatelliteNameClicked(sat_id) {
     search(sat_data[sat_id].name);
 }
