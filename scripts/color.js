@@ -245,7 +245,7 @@ function colorFunction(sat_id) {
 //      the alpha value
 //
 function alphaFunction(sat_id) {
-    return _SAT_IDS_SELECTED[sat_id] ? 1 : 0.2;
+    return _SAT_IDS_SELECTED[sat_id] ? 1 :(_ui_checkbox_show_unselected_satellites.checked ? 0.2 : 0);
 }
 
 // Function: getIndexFromRange
@@ -342,6 +342,13 @@ function transferDistance(sat_id) {
     }
 }
 
+// Function: getSatDistance
+//
+// Parameters:
+//      sat_id - the id of the satellite
+//
+// Returns:
+//      the distance from the satellite to earth's center (origin = (0,0,0))
 function getSatDistance(sat_id) {
     var x = sat_pos[sat_id*3];
     var y = sat_pos[sat_id*3+1];

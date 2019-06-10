@@ -34,6 +34,7 @@ var _ui_search_showing;
 var _ui_search_selected_only;
 var _ui_search_results_row;
 var _ui_search_showing_row;
+var _ui_checkbox_show_unselected_satellites;
 
 // Function: init
 // initializes the program by hooking up DOM elements with javscript callbacks as well as the canvas
@@ -81,6 +82,9 @@ function init() {
 
     _ui_search_results_row = document.getElementById("search-results-row");
     _ui_search_showing_row = document.getElementById("search-showing-row");
+
+    _ui_checkbox_show_unselected_satellites = document.getElementById("cb-show-unselected-satellites");
+    _ui_checkbox_show_unselected_satellites.addEventListener("change", updateSatellitesColor);
 
     // camera
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
