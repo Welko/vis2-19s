@@ -1,33 +1,59 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
 
-h1 {
-    color: #377eb8;
-    font-size: 2.5em;
-    text-align: center;
+img {
+    width: 100%;
 }
 
-h2 {
+.main {
+    width: 50%;
+    margin: auto;
+}
+
+h1 {
+    color: #377eb8;
+    font-size: 2.2em;
+    text-align: center;
+    margin: 0;
+}
+
+#names {
+    float: right;
+    padding: 0.75em;
+}
+
+#innerheader {
+    width: 50%;
+    margin: auto;
+    padding: 0.5em;
+}
+
+#header {
+    background-color: white;
+}
+
+.main h2 {
     color: #377eb8;
     border-bottom: 2px solid #377eb8;
     margin-top: 2em;
 }
 
-h3 {
+.main h3 {
     color: #377eb8;
     margin-top: 2em;
     margin-bottom: 0;
 }
 
 body {
-    color: rgb(255, 255, 255);
+    color: rgb(157, 157, 157);
     font-family: 'Open Sans', sans-serif;
     font-weight: 300;
 
-    background-color: black;
+    background-color: #111;
     overflow-x: hidden;
+    font-size: 1em;
 
-    margin: 0 1em 0 15em;
-    width: 50%;
+    padding: 0;
+    margin: 0;
 }
 
 p {
@@ -77,23 +103,9 @@ a:hover {
     margin: 5px;
 }
 
-#overlay-bottom {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-#overlay-right {
-    background-color: #3f3f3fc7;
-    height: 100%;
-    right: 0;
-    left: auto;
-    position: fixed;
-    text-align: left;
-    padding: 1em;
-}
 
 #overlay-left {
+    display: none;
     background-color: #3f3f3fc7;
     height: 100%;
     width: 12em;
@@ -135,26 +147,29 @@ a:hover {
     font-size: medium;
 }
 
-.list {
-    background-color: #202020;
+#navlist {
+    display: inline-block;
 }
 
-ul {
+#navlist ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-li a {
-    display: block;
+#navlist li {
+    display: inline-block;
+}
+
+#navlist li a {
+    display: inline-block;
     text-decoration: none;
-    color: white;
+    color: gray;
     padding: 0.75em;
 }
 
-li a:hover {
-    background-color: #377eb8;
-    color: black;
-    font-weight: bold;
+#navlist li a:hover {
+    background-color: #f0f0f0;
+    color: #377eb8;
 }
 
