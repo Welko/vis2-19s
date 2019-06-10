@@ -9,7 +9,16 @@ img {
     margin: auto;
 }
 
-.gallery img {
+.singlegallery img {
+    width: 30%;
+    display: inline-block;
+}
+
+.singlegallery {
+    text-align: center;
+}
+
+.doublegallery img {
     width: 48%;
     display: inline-block;
 }
@@ -18,10 +27,11 @@ img {
     text-align: center;
     width: 100%;
     display: inline-block;
-    margin: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
-.gallery img:last-of-type {
+.doublegallery img:last-of-type {
     float: right;
     margin-left: 0;
     margin-right: auto;
