@@ -36,22 +36,16 @@
  <div class="CBody"><p>returns the next color of the categorical colors list</p></div>
 </div>
 
-<a name="buildStringFromRange"></a><a name="Topic71"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">buildStringFromRange</div>
- <div id="NDPrototype71" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> buildStringFromRange(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">bottom,</td></tr><tr><td class="PName first last">step,</td></tr><tr><td class="PName first last">top</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>builds the string displaying the color information of numerical ranges, given the full range</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">bottom</td><td class="CDLDefinition"><p>the lowest value of the range</p></td></tr><tr><td class="CDLEntry">step</td><td class="CDLDefinition"><p>the size of each bin</p></td></tr><tr><td class="CDLEntry">top</td><td class="CDLDefinition"><p>the highest value of the range</p></td></tr></table><div class="CHeading">Returns</div><p>the html table containing the color information</p></div>
-</div>
-
-<a name="buildStringFromConstantStep"></a><a name="Topic72"></a><div class="CTopic TFunction LJavaScript">
+<a name="buildStringFromConstantStep"></a><a name="Topic108"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">buildStringFromConstantStep</div>
- <div id="NDPrototype72" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> buildStringFromConstantStep(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">start,</td></tr><tr><td class="PName first last">step</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>builds the string displaying the color information of numerical ranges, given the start and step size</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">start</td><td class="CDLDefinition"><p>the lowest value of the range</p></td></tr><tr><td class="CDLEntry">step</td><td class="CDLDefinition"><p>the size of each bin</p></td></tr></table><div class="CHeading">Returns</div><p>the html table containing the color information</p></div>
+ <div id="NDPrototype108" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> buildStringFromConstantStep(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">start,</td></tr><tr><td class="PName first last">step,</td></tr><tr><td class="PName first last">funGet,</td></tr><tr><td class="PName first last">funSet</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><p>builds the string displaying the color information of numerical ranges, given the start and step size</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">start</td><td class="CDLDefinition"><p>the lowest value of the range</p></td></tr><tr><td class="CDLEntry">step</td><td class="CDLDefinition"><p>the size of each bin</p></td></tr><tr><td class="CDLEntry">funGet</td><td class="CDLDefinition"><p>the function to find the satellites that fall into a category</p></td></tr><tr><td class="CDLEntry">funSet</td><td class="CDLDefinition"><p>the function name (string) to set the selection of the satellites that fall into a category WITHOUT ARGUMENTS</p></td></tr></table><div class="CHeading">Returns</div><p>the html table containing the color information</p></div>
 </div>
 
-<a name="addColorHtml"></a><a name="Topic73"></a><div class="CTopic TFunction LJavaScript">
+<a name="addColorHtml"></a><a name="Topic117"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">addColorHtml</div>
- <div id="NDPrototype73" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> addColorHtml(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">color,</td></tr><tr><td class="PName first last">descr</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><p>adds a table row of one color bin to the color dispaly</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">color</td><td class="CDLDefinition"><p>the color of the bin</p></td></tr><tr><td class="CDLEntry">descr</td><td class="CDLDefinition"><p>textual description of the bin</p></td></tr></table><div class="CHeading">Returns</div><p>the html row containing the color bin information</p></div>
+ <div id="NDPrototype117" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> addColorHtml(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">color,</td></tr><tr><td class="PName first last">descr,</td></tr><tr><td class="PName first last">count,</td></tr><tr><td class="PName first last">funSel,</td></tr><tr><td class="PName first last">funCle</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><p>adds a table row of one color bin to the color dispaly</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">color</td><td class="CDLDefinition"><p>the color of the bin</p></td></tr><tr><td class="CDLEntry">descr</td><td class="CDLDefinition"><p>textual description of the bin</p></td></tr><tr><td class="CDLEntry">count</td><td class="CDLDefinition"><p>the number of satellites that fall into this category</p></td></tr><tr><td class="CDLEntry">funSel</td><td class="CDLDefinition"><p>the name (string) of the function to be executed when the &quot;select all&quot; button is clicked WITH ARGUMENTS</p></td></tr><tr><td class="CDLEntry">funCle</td><td class="CDLDefinition"><p>the name (string) of the function to be executed when the &quot;clear&quot; button is clicked WITH ARGUMENTS</p></td></tr></table><div class="CHeading">Returns</div><p>the html row containing the color bin information</p></div>
 </div>
 
 <a name="initializeColorModeType"></a><a name="Topic65"></a><div class="CTopic TFunction LJavaScript">
@@ -108,9 +102,15 @@
  <div class="CBody"><p>transfer function for the &quot;altitude&quot; color mode</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>the id of the satellite</p></td></tr></table><div class="CHeading">Returns</div><p>the corresponding color</p></div>
 </div>
 
-<a name="transferAltitude(2)"></a><a name="Topic83"></a><div class="CTopic TFunction LJavaScript last">
+<a name="transferAltitude(2)"></a><a name="Topic83"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">transferAltitude</div>
  <div class="CBody"><p>transfer function for the &quot;distance&quot; color mode</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>the id of the satellite</p></td></tr></table><div class="CHeading">Returns</div><p>the corresponding color</p></div>
+</div>
+
+<a name="getSatDistance"></a><a name="Topic118"></a><div class="CTopic TFunction LJavaScript last">
+ <div class="CTitle">getSatDistance</div>
+ <div id="NDPrototype118" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> getSatDistance(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">sat_id</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>the id of the satellite</p></td></tr></table><div class="CHeading">Returns</div><p>the distance from the satellite to earth's center (origin = (0,0,0))</p></div>
 </div>
 
 </body></html>
