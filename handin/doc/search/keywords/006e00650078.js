@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("nex",["Function"],[["nextColorType",,[[,,,,0,"File:color.js:nextColorType"]]]]);

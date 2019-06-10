@@ -1,1 +1,0 @@
-NDFramePage.OnPageTitleLoaded("File:orbit-calculation-worker.js","orbit-calculation-worker.js");NDSummary.OnSummaryLoaded("File:orbit-calculation-worker.js",[["JavaScript","JavaScript"]],[["Functions","Function"],["Groups","Group"]],[[86,0,1,"Functions","Functions"],[87,0,0,"onmessage","onmessage"],[88,0,0,"projectPointOntoEarth","projectPointOntoEarth"]]);

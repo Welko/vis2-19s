@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("ast",["Function"],[["astronomyCalculation",,[[,,,,0,"File:scene-objects.js:astronomyCalculation"]]]]);

@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("ont",["Function"],[["onTableNameClicked",,[[,,,,0,"File:searcher.js:onTableNameClicked"]]],["onTableSelectAllClicked",,[[,,,,0,"File:searcher.js:onTableSelectAllClicked"]]]]);

@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("alp",["Function"],[["alphaFunction",,[[,,,,0,"File:color.js:alphaFunction"]]]]);

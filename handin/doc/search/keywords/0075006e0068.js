@@ -1,1 +1,0 @@
-NDSearch.OnPrefixDataLoaded("unh",["Function"],[["unhighlightSatellites",,[[,,,,0,"File:satellites.js:unhighlightSatellites"]]]]);
