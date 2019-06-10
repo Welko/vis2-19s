@@ -1,44 +1,23 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300');
 
+
+h1 {
+    text-align: center;
+}
+
 body {
     color: rgb(255, 255, 255);
     font-family: 'Open Sans', sans-serif;
-    text-align: center;
     font-weight: 300;
 
     background-color: black;
-    margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+
+    margin: 0 0 0 15em;
 }
 
 span {
     margin: 1em;
-}
-
-#overlay {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none;
-}
-
-#overlay * {
-    pointer-events: all;
-}
-
-#overlay-top {
-    position: absolute;
-    top: 0;
-    width: 100%;
-}
-
-#overlay-bottom {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
 }
 
 .hidden {
@@ -54,14 +33,6 @@ th { /* Table header */
     border-bottom: 2px #808080;
 }
 
-.flip-button::before {
-    content: "▼";
-}
-
-.satellite-info.full .flip-button::before {
-    content: "▲";
-}
-
 .panel {
     border: 1px solid lightgray;
     border-radius: 5px;
@@ -69,9 +40,10 @@ th { /* Table header */
     margin: 5px;
 }
 
-.overlay-panel {
-    overflow-y: auto;
-    overflow-x: hidden;
+#overlay-bottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
 #overlay-right {
@@ -79,7 +51,7 @@ th { /* Table header */
     height: 100%;
     right: 0;
     left: auto;
-    position: absolute;
+    position: fixed;
     text-align: left;
     padding: 1em;
 }
@@ -87,11 +59,13 @@ th { /* Table header */
 #overlay-left {
     background-color: #3f3f3fc7;
     height: 100%;
-    right: auto;
+    width: 12em;
+    top: 0;
     left: 0;
-    position: absolute;
+    position: fixed;
     text-align: left;
     padding: 1em;
+    overflow-x: hidden;
 }
 
 .clickable {
