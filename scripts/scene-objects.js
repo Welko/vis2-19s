@@ -64,8 +64,8 @@ function fillSceneWithObjects(scene) {
     equatorial_to_ecliptic = new THREE.Matrix3();
     equatorial_to_ecliptic.set(
         1, 0, 0,
-        0, cos_o, sin_o,
-        0, -sin_o, cos_o
+        0, -cos_o, -sin_o,
+        0, sin_o, -cos_o
     );
 
     // earth
@@ -82,7 +82,7 @@ function fillSceneWithObjects(scene) {
     createBody(Astronomy.Uranus, 25.559, 24.973, 0xbee4e7);
     createBody(Astronomy.Neptune, 24.764, 24.341, 0x3952d3);
 
-    astronomyCalculation();
+    continuousAstronomyCalculation();
 
     var r = "./resources/milky_way/";
     var urls = [
@@ -96,8 +96,8 @@ function fillSceneWithObjects(scene) {
     scene.background = textureCube;
 }
 
-function updateSceneObjects(delta, datetime) {
-    updateEarth(delta, datetime);
+function updateSceneObjects(delta) {
+    updateEarth(delta);
 }
 
 var AU_TO_KM = 149597870.7;
@@ -115,7 +115,7 @@ function addBodyOrbit(scene, body, color) {
     if (body.Name == "Sun") {
         period = 365.25; //https://en.wikipedia.org/wiki/Year
     }
-    var day = Astronomy.DayValue(new Date());
+    var day = Astronomy.DayValue(_datetime);
 
     for (var i = 0; i < SPACE_ORBIT_SEGMENTS; i++) {
         var segment = (i / SPACE_ORBIT_SEGMENTS) * period;
@@ -140,12 +140,22 @@ function addBodyOrbit(scene, body, color) {
 }
 
 function EquatorialToEclipticPlane(coordinates) {
-    return coordinates.applyMatrix3(equatorial_to_ecliptic); 
+    var cor = coordinates.applyMatrix3(equatorial_to_ecliptic);
+    return cor;
+}
+
+function updateSceneObjectDateRelevantInfos() {
+    astronomyCalculation();
+}
+
+function continuousAstronomyCalculation() {
+    astronomyCalculation();
+    setTimeout(astronomyCalculation, 1000);
 }
 
 function astronomyCalculation() {
     
-    var day = Astronomy.DayValue(new Date());
+    var day = Astronomy.DayValue(_datetime);
 
     for (var i = 0; i < bodies.length; i++) {
         var body = bodies[i].astronomy_body;
@@ -165,6 +175,4 @@ function astronomyCalculation() {
             sun_light.position.z = scene_object_pos.z;
         }
     }
-
-    setTimeout(astronomyCalculation, 1000);
 }

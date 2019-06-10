@@ -98,7 +98,9 @@ function getSatellites(scene, tle_text) {
     scene.add(orbit_selection_group);
 
     satelliteWorker.postMessage({
-        tle_data : tle_json
+        tle_data : tle_json,
+        datetime : _datetime,
+        date_update : false,
     });
 
     var ground_track_margin_km = 10;
@@ -107,6 +109,7 @@ function getSatellites(scene, tle_text) {
         is_init : true,
         tle_data : tle_json,
         segments : ORBIT_SEGMENTS,
+        datetime : _datetime,
         earth_scale : [
             _earth_scale_km[0] + ground_track_margin_km,
             _earth_scale_km[1] + ground_track_margin_km,
@@ -186,17 +189,26 @@ function prepareOrbitBuffers(count) {
 }
 
 function updateOrbitBuffer(sat_id) {
-    if(!in_progress[sat_id]) {
-        orbitWorker.postMessage({
-            is_init : false,
-            sat_id : sat_id
-            });
-        in_progress[sat_id] = true;
-    }
+    if(in_progress[sat_id]) return; // cancel because orbit is currently calculated
+
+    orbitWorker.postMessage({
+        datetime : _datetime,
+        is_init : false,
+        sat_id : sat_id
+    });
+
+    in_progress[sat_id] = true;
 };
 
-function displayOrbit(sat_id) {
-    // TODO fill up?
+function updateSatelliteDateRelevantInfos() {
+    updateSatelliteCalculationWorker();
+}
+
+function updateSatelliteCalculationWorker() {
+    satelliteWorker.postMessage({
+        datetime : _datetime,
+        date_update : true,
+    });
 }
 
 var got_extra_data = false;
@@ -279,7 +291,6 @@ function resetSatellite(sat_id, scene, sizes) {
 
 function highlightSatellite(sat_id, scene, sizes) {
     updateOrbitBuffer(sat_id);
-    displayOrbit(sat_id);
 
     sizes.array[sat_id] = SATELLITE_SIZE * 1.5;
     sizes.needsUpdate = true;

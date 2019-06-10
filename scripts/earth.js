@@ -22,6 +22,7 @@ function fillSceneWithEarth(scene) {
     var earth_bump;// = new THREE.TextureLoader().load('./resources/earth_bump.png');
     var earth_material = new THREE.MeshToonMaterial({
         map: new THREE.TextureLoader().load('./resources/earth.jpg'),
+        gradientMap: new THREE.TextureLoader().load('./resources/gradient_map.png'),
         bumpMap: earth_bump,
         bumpScale: 0.1,
         roughnessMap: earth_bump,
@@ -84,10 +85,8 @@ function positionCone(p) {
 }
 
 
-function updateEarth(delta, datetime) {
-    // deltaaccum += delta;
-    // var newDateObj = new Date(datetime.getTime() + dateshift*60000);
-    var gmst = satellite.gstime(datetime);
+function updateEarth(delta) {
+    var gmst = satellite.gstime(_datetime);
     earth.setRotationFromAxisAngle(new THREE.Vector3(0,1,0), gmst);
 }
 
@@ -101,7 +100,7 @@ function findSatellitesInCone() {
 
     var sat_indexes = [];
     for (var i = 0; i < sat_pos.length; i++) {
-        var p = new THREE.Vector3(sat_pos[i*3], -sat_pos[i*3+1], sat_pos[i*3+2]);
+        var p = new THREE.Vector3(sat_pos[i*3], sat_pos[i*3+2], -sat_pos[i*3+1]);
         p.normalize();
 
         var c = cone_lookAt_point_normalized;

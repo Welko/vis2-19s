@@ -4,6 +4,8 @@ var Vector3 = THREE.Vector3;
 
 var KM_TO_WORLD_UNITS = 0.001;
 
+var _datetime;
+
 var container;
 var camera, scene, renderer;
 var cameraControls;
@@ -29,26 +31,45 @@ var _ui_search_table;
 
 function init() {
 
-    container = document.getElementById('canvas');
-    satellite_nameplate = document.getElementById('satellite-nameplate');
-    satellite_info_box = document.getElementById('satellite-info-box');
-    _ui_satellites_count = document.getElementById('satellites-count');
-    _ui_color_info_table = document.getElementById('color-info-table');
+  _datetime = new Date();
 
-    _ui_color_select = document.getElementById('color-select');
-    _ui_color_select.addEventListener('change', function () {
-        updateSatellitesColor();
-    }, false);
+  container = document.getElementById('canvas');
+  satellite_nameplate = document.getElementById('satellite-nameplate');
+  satellite_info_box = document.getElementById('satellite-info-box');
+  _ui_satellites_count = document.getElementById('satellites-count');
+  _ui_color_info_table = document.getElementById('color-info-table');
 
-    var button_clear_selection = document.getElementById("button-clear-selection");
-    button_clear_selection.addEventListener("click", function () {
-        clearSatelliteSelection();
-    });
+  var time_input = document.getElementById('timeinput');
 
-    _ui_search = document.getElementById("search");
-    _ui_search.addEventListener("input", onSearchTextChanged);
+  var update_time = function() {
+    var minutes = time_input.value;
+    _datetime = new Date(new Date().getTime() + minutes*60000);
+    updateDateRelevantInfos();
+  }
 
-    _ui_search_table = document.getElementById("search-table");
+  time_input.oninput = update_time;
+  // time_input.onchange = update_time;
+
+  var now_button = document.getElementById("now-button");
+  now_button.addEventListener("click", function () {
+    time_input.value = 0;
+    update_time();
+  });
+
+  _ui_color_select = document.getElementById('color-select');
+  _ui_color_select.addEventListener('change', function () {
+      updateSatellitesColor();
+  }, false);
+
+  var button_clear_selection = document.getElementById("button-clear-selection");
+  button_clear_selection.addEventListener("click", function () {
+      clearSatelliteSelection();
+  });
+
+  _ui_search = document.getElementById("search");
+  _ui_search.addEventListener("input", onSearchTextChanged);
+
+  _ui_search_table = document.getElementById("search-table");
 
   // camera
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, 10000000);
@@ -89,6 +110,11 @@ function onWindowResize(event) {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function updateDateRelevantInfos() {
+  updateSceneObjectDateRelevantInfos();
+  updateSatelliteDateRelevantInfos();
 }
 
 function onKeyDown(event) {
@@ -152,7 +178,12 @@ function animate() {
 function render() {
   //updateTime();
   let delta = clock.getDelta();
-  var datetime = new Date(); // TODO: change so every date value uses this an make it configurable
+
+  if (_datetime === undefined) {
+    _datetime = new Date();
+  } else {
+    _datetime = new Date(_datetime.getTime() + delta*1000);
+  }
 
   cameraControls.update(delta);
   raycaster.setFromCamera(mouse, camera);
@@ -165,14 +196,14 @@ function render() {
   if (plsIntersect && (f_shift_down || f_ctrl_down) && f_drag && earth != null) {
     var intersection = intersectEarth(raycaster);
     if (intersection !== null) {
-        positionCone(intersection.point);
-        var sat_indexes_in_cone = findSatellitesInCone();
-        if (f_shift_down) {
-            addSelectedSatellites(sat_indexes_in_cone);
-        } else { //if (f_ctrl_down) {
-            removeSelectedSatellites(sat_indexes_in_cone);
-        }
-        plsIntersect = false;
+      positionCone(intersection.point);
+      var sat_indexes_in_cone = findSatellitesInCone();
+      if (f_shift_down) {
+          addSelectedSatellites(sat_indexes_in_cone);
+      } else { //if (f_ctrl_down) {
+          removeSelectedSatellites(sat_indexes_in_cone);
+      }
+      plsIntersect = false;
     }
   }
 
@@ -182,7 +213,7 @@ function render() {
   }
 
   updateSatellites(delta);
-  updateSceneObjects(delta, datetime);
+  updateSceneObjects(delta);
 
   // render scene
   renderer.render(scene, camera);

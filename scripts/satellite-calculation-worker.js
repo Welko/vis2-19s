@@ -5,9 +5,16 @@ importScripts('../libs/satellite.js');
 var tle_cache = [];
 var sat_pos, sat_vel, sat_geo;
 
+var datetime;
+var datetime_j_difference;
+
 onmessage = function(m) {
-  var start = Date.now();
-  
+
+  datetime = new Date(m.data.datetime);
+  datetime_j_difference = satellite.jday(datetime) - satellite.jday(new Date());
+
+  if (m.data.date_update) return; // just updating datetime
+
   var tle_data = m.data.tle_data;
   var len = tle_data.length;
 
@@ -39,20 +46,18 @@ onmessage = function(m) {
   
   sat_pos = new Float32Array(len * 3);
   sat_vel = new Float32Array(len * 3);
-    sat_geo = new Float32Array(len * 3);
+  sat_geo = new Float32Array(len * 3);
   
-  var postStart = Date.now();
   postMessage({
     extra_data : JSON.stringify(extra_data),
   });
-  console.log('satellite calculation worker init: ' + (Date.now() - start) + ' ms  (incl post: ' + (Date.now() - postStart) + ' ms)');
+
   propagate();
 };
 
 function propagate() {
   
-  var datetime = new Date();   
-  var j = satellite.jday(datetime);  
+  var j = satellite.jday(new Date()) + datetime_j_difference;  
   var gmst = satellite.gstime(j);
   
   for(var i = 0; i < tle_cache.length; i++) {

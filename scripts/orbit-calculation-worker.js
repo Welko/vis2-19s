@@ -28,8 +28,7 @@ onmessage = function(m) {
     var orbit_points = new Float32Array((NUM_SEGS + 1) * 3);
     var proj_points  = new Float32Array((NUM_SEGS + 1) * 3);
     
-    var datetime = new Date();   
-    var orbit_days = 1;
+    var datetime = new Date(m.data.datetime);   
     // var end_datetime = new Date(datetime.valueOf());
     // end_datetime.setDate(end_datetime.getDate() + orbit_days);
     var j = satellite.jday(datetime);
@@ -90,23 +89,9 @@ function projectPointOntoEarth(p, gmst, scale) {
   var norm_z = z/length * scale[2];
 
   // https://github.com/shashwatak/satellite-js/blob/develop/src/transforms.js#L126
-  var sx = (norm_x * Math.cos(gmst)) + (norm_y * Math.sin(gmst));
-  var sy = (norm_x * (-Math.sin(gmst))) + (norm_y * Math.cos(gmst));
-  var sz = norm_z;
-
-  // var nx = sx;
-  // var ny = sy;
-  // var nz = sy;
-
-  x = sx;
-  y = sy;
-  z = sz;
-
-  
-
-  // x = (norm_x * Math.cos(gmst)) + (norm_z * Math.sin(gmst));
-  // z = (norm_x * (-Math.sin(gmst))) + (norm_z * Math.cos(gmst));
-  // y = norm_y;
+  x = (norm_x * Math.cos(gmst)) + (norm_y * Math.sin(gmst));
+  y = (norm_x * (-Math.sin(gmst))) + (norm_y * Math.cos(gmst));
+  z = norm_z;
 
   return [x, y, z];
 }
