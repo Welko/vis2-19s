@@ -101,10 +101,22 @@
  <div class="CBody"><p>intersects the satellite cloud using the given raycaster, used for deciding which satellite is below the cursor</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">raycaster</td><td class="CDLDefinition"><p>THREE.js raycaster object of the scene</p></td></tr><tr><td class="CDLEntry">container</td><td class="CDLDefinition"><p>DOM element handle for changing the cursor</p></td></tr></table><div class="CHeading">Returns</div><p>a boolean indicating whether the ray hit something</p></div>
 </div>
 
-<a name="selectSatellite"></a><a name="Topic29"></a><div class="CTopic TFunction LJavaScript">
+<a name="selectSatellite"></a><a name="Topic109"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">selectSatellite</div>
- <div id="NDPrototype29" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> selectSatellite(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">sat_id</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
- <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry">selects a satellite</td><td class="CDLDefinition"><p>that is displaying its orbit, ground track and information continously even if not hovered over</p></td></tr></table><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>id of the satellite that should become selected</p></td></tr></table></div>
+ <div id="NDPrototype109" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> selectSatellite(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">sat_id</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry">selects a satellite</td><td class="CDLDefinition"><p>that is displaying its orbit, ground track and information continously even if not hovered over called only when hovering + click (because then we already have the orbit and projection line)</p></td></tr></table><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>id of the satellite that should become selected</p></td></tr></table></div>
+</div>
+
+<a name="cloneOrbitAndProjection"></a><a name="Topic110"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">cloneOrbitAndProjection</div>
+ <div id="NDPrototype110" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> cloneOrbitAndProjection(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">sat_id</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><p>clones the THREE.js buffers of the orbit and the projection line so they can be displayed</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>id of the satellite that should become selected</p></td></tr></table></div>
+</div>
+
+<a name="displaySatelliteOrbit"></a><a name="Topic111"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">displaySatelliteOrbit</div>
+ <div id="NDPrototype111" class="NDPrototype WideForm CStyle"><table><tr><td class="PBeforeParameters"><span class="SHKeyword">function</span> displaySatelliteOrbit(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">sat_id</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div>
+ <div class="CBody"><p>display a satellites orbit, ground track and information continously even if not hovered over, called if added to the details list (also from the outside)</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">sat_id</td><td class="CDLDefinition"><p>id of the satellite that should become selected</p></td></tr></table></div>
 </div>
 
 <a name="removeSatellite"></a><a name="Topic32"></a><div class="CTopic TFunction LJavaScript last">

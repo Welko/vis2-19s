@@ -28,6 +28,8 @@ function addSatelliteToList(sat_id) {
          return;
     }
 
+    displaySatelliteOrbit(sat_id); // calls satellite.js to show orbit and ground track
+
     var data = sat_data[sat_id];
     var extra = sat_extra[sat_id];
 
