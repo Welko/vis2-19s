@@ -1,0 +1,1 @@
+NDMenu.OnSectionLoaded("files.js",[[1,"color.js"],[1,"earth.js"],[1,"main.js"],[1,"orbit-calculation-worker.js"],[1,"satellite-calculation-worker.js"],[1,"satellites.js"],[1,"satellite-selector.js"],[1,"satellites-ui.js"],[1,"scene-objects.js"],[1,"searcher.js"]]);
