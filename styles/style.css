@@ -279,6 +279,10 @@ button {
   cursor: pointer;
 }
 
+input[type="number"] {
+  width: 3em;
+}
+
 .search-select-button-yes {
   background-color: #77bb77;
 }

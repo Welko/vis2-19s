@@ -37,14 +37,6 @@ function setSelectedSatellites(sat_indices, value) {
 
     var count = 0;
 
-    // Debug TODO remove
-    var trues = [];
-    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
-        if (_SAT_IDS_SELECTED[i]) {
-            trues.push(i);
-        }
-    }
-
     for (var i = 0; i < sat_indices.length; i++) {
         var index = sat_indices[i];
         var old = _SAT_IDS_SELECTED[index];
@@ -61,14 +53,6 @@ function setSelectedSatellites(sat_indices, value) {
         }
     }
 
-    // Debug TODO remove
-    var trues = [];
-    for (var i = 0; i < _SAT_IDS_SELECTED.length; i++) {
-        if (_SAT_IDS_SELECTED[i]) {
-            trues.push(i);
-        }
-    }
-
     colorsObj.needsUpdate = true;
 
     return count;
@@ -79,7 +63,7 @@ function setSelectedSatellites(sat_indices, value) {
 // sets all satellites to the given value
 //
 // Parameters:
-//      value - boolean, the value all satellites will be set to 
+//      value - boolean, the value all satellites will be set to
 //      update_search - default: true, whether the search should be updated
 //
 function setAllSatellites(value, update_search=true) {
@@ -221,35 +205,117 @@ function areAllSatellitesSelected(sat_indices) {
     return true;
 }
 
-// Function: mergeSorted
-//
-// merges two sorted arrays so that the merged array only includes common elements once (union)
+// Function: getSatellitesByDistanceRange
 //
 // Parameters:
-//      a1 - a sorted array with no repeating elements
-//      a2 - a sorted array with no repeating elements
+//      disMinIncl - the minimum distance for selection (inclusive)
+//      disMaxExcl - the maximum distance for selection (exclusive)
 //
 // Returns:
-//      an array which is the union of the two given arrays
+//      a list with the indexes of the satellites that currently have a distance in the range [disMinIncl, disMaxExcl)
+function getSatellitesByDistanceRange(disMinIncl, disMaxExcl) {
+    var sats = [];
+    for (var i = 0; i < sat_data.length; i++) {
+        var dis = getSatDistance(i);
+        if (dis >= disMinIncl && dis < disMaxExcl) {
+            sats.push(i);
+        }
+    }
+    return sats;
+}
+
+// Function: getSatellitesByAltitudeRange
 //
-function mergeSorted(a1, a2) {
-    var out = [];
-    var i = 0;
-    var j = 0;
+// Parameters:
+//      altMinIncl - the minimum altitude for selection (inclusive)
+//      altMaxExcl - the maximum altitude for selection (exclusive)
+//
+// Returns:
+//      a list with the indexes of the satellites that currently have an altitude in the range [altMinIncl, altMaxExcl)
+function getSatellitesByAltitudeRange(altMinIncl, altMaxExcl) {
+    var sats = [];
+    for (var i = 0; i < sat_data.length; i++) {
+        var alt = sat_geo[i*3+2];
+        if (alt >= altMinIncl && alt < altMaxExcl) {
+            sats.push(i);
+        }
+    }
+    return sats;
+}
 
-    var min = Math.min(a1.length, a2.length);
-    while (i < min && j < min) {
-        if      (a1[i] < a2[j]) out.push(a1[i++]);
-        else if (a1[i] < a2[j]) out.push(a2[j++]);
+// Function: getSatellitesByType
+//
+// Parameters:
+//      types - a list with the types for selection
+//
+// Returns:
+//      a list with the indexes of the satellites that have one of the types in the input array 'types'
+function getSatellitesByTypes(types) {
+    var types_upper = new Array(types.length);
+    for (var i = 0; i < types.length; i++) {
+        types_upper[i] = types[i].toUpperCase();
     }
 
-    if (i === a1.length) {
-        a1 = a2;
-        i = j;
-    }
-    for (; i < a1.length; i++) {
-        out.push(a1[i]);
+    var sats = [];
+    for (var i = 0; i < sat_data.length; i++) {
+        var sat_type = sat_data[i].type.toUpperCase();
+        if (types_upper.includes(sat_type)) {
+            sats.push(i);
+        }
     }
 
-    return out;
+    return sats;
+}
+
+// Function: setSelectionByDistanceRange
+//
+// sets the satellites selection based on whether their current distance falls in a given range
+//
+// Parameters:
+//      disMinIncl - the minimum distance for selection (inclusive)
+//      disMaxExcl - the maximum distance for selection (exclusive)
+//      value      - a boolean indicating what value to set
+//
+function setSelectionByDistanceRange(disMinIncl, disMaxExcl, value) {
+    var sat_ids = getSatellitesByDistanceRange(disMinIncl, disMaxExcl);
+    if (value) {
+        addSelectedSatellites(sat_ids);
+    } else {
+        removeSelectedSatellites(sat_ids);
+    }
+}
+
+// Function: setSelectionByAltitudeRange
+//
+// sets the satellites selection based on whether their current altitude falls in a given range
+//
+// Parameters:
+//      altMinIncl - the minimum altitude for selection (inclusive)
+//      altMaxExcl - the maximum altitude for selection (exclusive)
+//      value      - a boolean indicating what value to set
+//
+function setSelectionByAltitudeRange(altMinIncl, altMaxExcl, value) {
+    var sat_ids = getSatellitesByAltitudeRange(altMinIncl, altMaxExcl);
+    if (value) {
+        addSelectedSatellites(sat_ids);
+    } else {
+        removeSelectedSatellites(sat_ids);
+    }
+}
+
+// Function: setSelectionByTypes
+//
+// sets the satellites selection based on their type
+//
+// Parameters:
+//      types - a list with the types for selection
+//      value - a boolean indicating what value to set
+//
+function setSelectionByTypes(types, value) {
+    var sat_ids = getSatellitesByTypes(types);
+    if (value) {
+        addSelectedSatellites(sat_ids);
+    } else {
+        removeSelectedSatellites(sat_ids);
+    }
 }

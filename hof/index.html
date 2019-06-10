@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Satellite Tracker by Lucas and Dominik</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<img>
+
+<h1>Real-Time Interactive Satellite Tracker</h1>
+
+<div id="overlay-left">
+    <div class="panel list">
+        <ul>
+            <!--<li><a href="">Overview</a></li>-->
+            <li><a href="https://github.com/Welko/vis2-19s">Source code</a></li>
+            <li><a href="../documentation/index.html">Documentation</a></li>
+        </ul>
+    </div>
+    <div class="panel">
+        <table id="authors">
+            <tr><th>Authors</th></tr>
+            <tr><td>Dominik Scholz</td></tr>
+            <tr><td>Lucas da Cunha Melo</td></tr>
+        </table>
+    </div>
+</div>
+
+<img>Insert nice image here</img>
+
+<h2>Overview</h2>
+
+<p>
+    Satellite data comes in the form of a Two-Line Element (TLE) set (<a href="#">Figure 1</a>), a format that describe
+    a satellite's orbital elements.
+
+    TLE can be used to find a satellite's position in space, but it is highly non-human-readable.
+
+    Additionally, this data (provided by, e.g., <a href="https://sscweb.sci.gsfc.nasa.gov/">SSCWeb</a> and
+    <a href="https://www.space-track.org/documentation#/api">Space-Track.org</a>) is provided in large numbers
+    (approximately 17.000 satellites).
+</p>
+
+<p>
+    For that reason, current satellite visualization applications struggle to provide effective exploration tools.
+
+    Real-Time Interactive Satellite Tracker (RTIST) is a tool for the exploration of earth's satellites.
+
+    Using techniques such as brushing, dynamic queries and details on demand, this application enables users to
+    visualize only the satellites they are interested in. <span class="todo">Sounds bad. Elaborate</span>
+</p>
+
+<h2>Features</h2>
+<p>
+    The features of RTIST are all implemented with visualization principles in mind, aiming to accelerate and
+    facilitate the user's insight gaining process.
+
+    In the following sections, these features are presented.
+</p>
+
+<h3>Real time tracking</h3>
+<p>
+    In order to deliver a reasonably accurate visualization of satellites and, at the same time, smooth the user's
+    interactions (crucial for exploration applications), RTIST periodically fetches TLE data from online providers.
+
+    For a given short time interval <span class="todo">How much time?</span>, the satellite's velocity is used to estimate its
+    position.
+</p>
+
+<p>
+    After each short interval, every satellite's new position and velocity are calculated based on the cached TLE data.
+
+    This is done multiple times for a longer time interval <span class="todo">How much time?</span>, after which the TLE data is fetched again.
+</p>
+
+<h3>Ground track visualization</h3>
+<p>Blablabla</p>
+<p>Coordinate transforms</p>
+
+<h3>Brushing</h3>
+<p>
+    The implemented brushing tool enables the user to select a point the earth's surface, from which the satellites in
+    a given radius are selected.
+
+    This selection is visualized in the form of a cone, as shown in <a href="#">Figure 2</a>.
+
+    With this tool, users can brush over a region on earth (countries, continents) and find all satellites currently
+    over the defined area.
+</p>
+
+<p>
+    <span class="todo">Brush angle slider</span>
+</p>
+
+<h3>Search</h3>
+<p>Blablabla</p>
+
+<h3>Color</h3>
+<p>
+
+    <a href="http://colorbrewer2.org/">ColorBrewer</a>
+</p>
+
+<h3>Details on demand</h3>
+<p>Blablabla</p>
+
+</body>
+</html>

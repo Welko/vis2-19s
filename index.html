@@ -52,12 +52,28 @@
     <div class="panel">Satellite Tracker by Lucas and Dominik</div>
     <div class="panel">
       <div class="panel-header">
+        Options
+      </div>
+      <table>
+          <tr><td><input type="checkbox" id="cb-show-unselected-satellites">Show unselected satellites</input></td></tr>
+          <tr><td><input type="checkbox" id="cb-show-planets">Show planets</input></td></tr>
+          <tr><td><input type="checkbox" id="cb-show-axes">Show axes</input></td></tr>
+          <tr><td><input type="checkbox" id="cb-texture-earth">Texture earth</input></td></tr>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
         Selection
         <div class="panel-header-controls">
             <button id="button-clear-selection" class="menu-button">Clear</button>
-        </div>
+            <button id="button-add-all-selection" class="menu-button">Select all</button>
+          </div>
       </div>
       <table id="selection-table">
+        <tr><td>Brush angle</td>
+            <td><input type="number" min="1" max="45" value="5"/></td>
+            <td><input type="range" min="1" max="45" value="5"/></td>
+        </tr>
         <tr><td>Count</td><td id="satellites-count">0</td></tr>
       </table>
     </div>
@@ -79,7 +95,7 @@
     <!-- <button id="stop-button"><span class="icon stop-icon"></span></button> -->
     <button id="now-button" class="menu-button">Now</button>
     <div id="timeline">
-      <input type="range" min="-10080" max="10080" value="0" class="slider" id="timeinput"></input>
+      <input type="range" min="-10080" max="10080" value="0" class="slider" id="timeinput"/>
     </div>
   </div>
 </div>
